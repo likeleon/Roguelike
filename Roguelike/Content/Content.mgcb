@@ -13,3 +13,13 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Fonts/ADDSBP__.TTF
+/copy:Fonts/ADDSBP__.TTF
+
+#begin Fonts/ADDSBP__.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/ADDSBP__.spritefont
+

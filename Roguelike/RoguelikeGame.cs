@@ -11,7 +11,8 @@ namespace Roguelike
         private Point _viewportSize;
 
         private SpriteBatch _spriteBatch;
-        
+        private SpriteFont _font;
+
         public RoguelikeGame()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -35,7 +36,7 @@ namespace Roguelike
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            _font = Content.Load<SpriteFont>("Fonts/ADDSBP__");
         }
 
         protected override void UnloadContent()
@@ -57,7 +58,13 @@ namespace Roguelike
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            _spriteBatch.Begin();
+
+            var text = "MonoGame Font Test";
+            var textMiddlePoint = _font.MeasureString(text) / 2;
+            _spriteBatch.DrawString(_font, text, _viewportCenter, Color.White, 0, textMiddlePoint, 1.0f, SpriteEffects.None, 0.5f);
+
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
