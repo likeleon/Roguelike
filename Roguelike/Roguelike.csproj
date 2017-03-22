@@ -43,6 +43,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Graphics\IDrawable.cs" />
+    <Compile Include="Graphics\Sprite.cs" />
+    <Compile Include="Graphics\Transformable.cs" />
     <Compile Include="RoguelikeGame.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

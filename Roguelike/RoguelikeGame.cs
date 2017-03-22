@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Roguelike.Graphics;
+using System.Collections.Generic;
 
 namespace Roguelike
 {
@@ -12,6 +14,8 @@ namespace Roguelike
 
         private SpriteBatch _spriteBatch;
         private SpriteFont _font;
+
+        private readonly List<Sprite> _uiSprites = new List<Sprite>();
 
         public RoguelikeGame()
         {
@@ -37,6 +41,18 @@ namespace Roguelike
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _font = Content.Load<SpriteFont>("Fonts/ADDSBP__");
+
+            LoadUI();
+        }
+
+        private void LoadUI()
+        {
+            var playerUiSprite = new Sprite(Content.Load<Texture2D>("UI/spr_warrior_ui"))
+            {
+                Position = new Vector2(45.0f, 45.0f),
+                Origin = new Vector2(30.0f, 30.0f)
+            };
+            _uiSprites.Add(playerUiSprite);
         }
 
         protected override void UnloadContent()
@@ -63,6 +79,9 @@ namespace Roguelike
             var text = "MonoGame Font Test";
             var textMiddlePoint = _font.MeasureString(text) / 2;
             _spriteBatch.DrawString(_font, text, _viewportCenter, Color.White, 0, textMiddlePoint, 1.0f, SpriteEffects.None, 0.5f);
+
+            foreach (var sprite in _uiSprites)
+                sprite.Draw(_spriteBatch);
 
             _spriteBatch.End();
 
