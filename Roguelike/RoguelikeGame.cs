@@ -9,12 +9,14 @@ namespace Roguelike
     public class RoguelikeGame : Game
     {
         private readonly GraphicsDeviceManager _graphics;
+
         private ScalingViewportAdapter _scalingViewportAdapter;
         private Vector2 _screenCenter;
         private Point _screenSize;
 
         private SpriteBatch _spriteBatch;
         private SpriteFont _font;
+        private Level _level;
 
         private readonly List<Sprite> _uiSprites = new List<Sprite>();
 
@@ -45,6 +47,8 @@ namespace Roguelike
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _font = Content.Load<SpriteFont>("Fonts/ADDSBP__");
+
+            _level = new Level(Content, _screenSize);
 
             LoadUI();
         }
