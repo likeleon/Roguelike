@@ -9,11 +9,13 @@ namespace Roguelike
     {
         private static int GridWidth = 19;
         private static int GridHeight = 19;
-        private static int TileSize = 50;
-
+  
         private readonly Texture2D[] _tileTextures = new Texture2D[Enum.GetValues(typeof(TileType)).Length];
-        private readonly Point _origin;
         private readonly Tile[,] _grid = new Tile[GridWidth, GridHeight];
+
+        public Point Origin { get; }
+        public Point Size => new Point(GridWidth, GridHeight);
+        public int TileSize { get; } = 50;
 
         public Level(ContentManager content, Point screenSize)
         {
@@ -45,7 +47,7 @@ namespace Roguelike
 
             var originX = (screenSize.X - GridWidth * TileSize) / 2;
             var originY = (screenSize.Y - GridHeight * TileSize) / 2;
-            _origin = new Point(originX, originY);
+            Origin = new Point(originX, originY);
 
             for (int x = 0; x < _grid.GetLength(0); ++x)
                 for (int y = 0; y < _grid.GetLength(1); ++y)

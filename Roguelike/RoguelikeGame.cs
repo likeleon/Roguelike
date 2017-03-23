@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Roguelike.Graphics;
 using System.Collections.Generic;
+using System;
 
 namespace Roguelike
 {
@@ -19,6 +20,7 @@ namespace Roguelike
         private Level _level;
 
         private readonly List<Sprite> _uiSprites = new List<Sprite>();
+        private readonly List<Sprite> _lightGrid = new List<Sprite>();
 
         public RoguelikeGame()
         {
@@ -51,6 +53,8 @@ namespace Roguelike
             _level = new Level(Content, _screenSize);
 
             LoadUI();
+
+            ConstructLightGrid();
         }
 
         private void LoadUI()
@@ -128,6 +132,27 @@ namespace Roguelike
             });
         }
 
+        private void ConstructLightGrid()
+        {
+            var lightTexture = Content.Load<Texture2D>("spr_light_grid");
+
+            var levelAreaSize = new Point(_level.Size.X * _level.TileSize, _level.Size.Y * _level.TileSize);
+            var levelArea = new Rectangle(_level.Origin, levelAreaSize);
+
+            var width = levelArea.Width / 25;
+            var height = levelArea.Height / 25;
+            var lightTotal = width * height;
+
+            for (int i = 0; i < lightTotal; ++i)
+            {
+                var lightSprite = new Sprite(lightTexture);
+                var lightPositionX = levelArea.Left + ((i % width) * 25);
+                var lightPositionY = levelArea.Top + ((i / width) * 25);
+                lightSprite.Position = new Vector2(lightPositionX, lightPositionY);
+                _lightGrid.Add(lightSprite);
+            }
+        }
+
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
@@ -138,20 +163,41 @@ namespace Roguelike
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            var playerPosition = _screenCenter + new Vector2(197.0f, 410.0f);
+
+            UpdateLight(playerPosition);
 
             base.Update(gameTime);
         }
 
+        private void UpdateLight(Vector2 playerPosition)
+        {
+            foreach (var sprite in _lightGrid)
+            {
+                var tileAlpha = 255.0f;
+
+                var distance = Vector2.Distance(sprite.Position, playerPosition);
+                if (distance < 200.0f)
+                    tileAlpha = 0.0f;
+                else if (distance < 250.0f)
+                    tileAlpha = (51.0f * (distance - 200.0f)) / 10.0f;
+
+                sprite.Color = new Color(255, 255, 255, (int)tileAlpha);
+            }
+        }
+
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(new Color(3, 3, 3, 225));
 
             _spriteBatch.Begin(transformMatrix: _scalingViewportAdapter.GetScaleMatrix());
 
             var text = "MonoGame Font Test";
             var textMiddlePoint = _font.MeasureString(text) / 2;
             _spriteBatch.DrawString(_font, text, _screenCenter, Color.White, 0, textMiddlePoint, 1.0f, SpriteEffects.None, 0.5f);
+
+            foreach (var sprite in _lightGrid)
+                sprite.Draw(_spriteBatch);
 
             foreach (var sprite in _uiSprites)
                 sprite.Draw(_spriteBatch);
