@@ -42,7 +42,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Graphics\IDrawable.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Graphics\Transformable.cs" />

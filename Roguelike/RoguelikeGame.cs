@@ -22,6 +22,8 @@ namespace Roguelike
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
+            _graphics.PreferredBackBufferWidth = 1920;
+            _graphics.PreferredBackBufferHeight = 1080;
             _graphics.SynchronizeWithVerticalRetrace = true;
 
             IsMouseVisible = false;
@@ -47,12 +49,77 @@ namespace Roguelike
 
         private void LoadUI()
         {
-            var playerUiSprite = new Sprite(Content.Load<Texture2D>("UI/spr_warrior_ui"))
+            // Player
+            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_warrior_ui"))
             {
                 Position = new Vector2(45.0f, 45.0f),
                 Origin = new Vector2(30.0f, 30.0f)
-            };
-            _uiSprites.Add(playerUiSprite);
+            });
+
+            // Bars
+            var barOutlineTexture = Content.Load<Texture2D>("UI/spr_bar_outline");
+            var barOutlineTextureOrigin = barOutlineTexture.Bounds.Size.ToVector2() / 2.0f;
+            _uiSprites.Add(new Sprite(barOutlineTexture)
+            {
+                Position = new Vector2(205.0f, 35.0f),
+                Origin = barOutlineTextureOrigin
+            });
+            _uiSprites.Add(new Sprite(barOutlineTexture)
+            {
+                Position = new Vector2(205.0f, 55.0f),
+                Origin = barOutlineTextureOrigin
+            });
+
+            // Coin and Gem
+            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_gem_ui"))
+            {
+                Position = new Vector2(_viewportCenter.X - 260.0f, 50.0f),
+                Origin = new Vector2(42.0f, 36.0f)
+            });
+            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_coin_ui"))
+            {
+                Position = new Vector2(_viewportCenter.X + 60.0f, 50.0f),
+                Origin = new Vector2(48.0f, 24.0f)
+            });
+
+            // Key pickup
+            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_key_ui"))
+            {
+                Position = _viewportSize.ToVector2() - new Vector2(120.0f, 70.0f),
+                Origin = new Vector2(90.0f, 45.0f),
+                Color = new Color(255, 255, 255, 60)
+            });
+
+            // Stats
+            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_attack_ui"))
+            {
+                Origin = new Vector2(16.0f, 16.0f),
+                Position = _viewportCenter - new Vector2(270.0f, 30.0f)
+            });
+
+            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_defense_ui"))
+            {
+                Origin = new Vector2(16.0f, 12.0f),
+                Position = _viewportCenter - new Vector2(150.0f, 30.0f)
+            });
+
+            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_strength_ui"))
+            {
+                Origin = new Vector2(22.0f, 12.0f),
+                Position = _viewportCenter - new Vector2(30.0f, 30.0f)
+            });
+
+            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_dexterity_ui"))
+            {
+                Origin = new Vector2(16.0f, 12.0f),
+                Position = _viewportCenter + new Vector2(90.0f, -30.0f)
+            });
+
+            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_stamina_ui"))
+            {
+                Origin = new Vector2(16.0f, 16.0f),
+                Position = _viewportCenter + new Vector2(210.0f, -30.0f)
+            });
         }
 
         protected override void UnloadContent()
