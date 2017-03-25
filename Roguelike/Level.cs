@@ -1,7 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Roguelike.Graphics;
 using System;
+using System.IO;
+using System.Linq;
 
 namespace Roguelike
 {
@@ -12,6 +15,7 @@ namespace Roguelike
   
         private readonly Texture2D[] _tileTextures = new Texture2D[Enum.GetValues(typeof(TileType)).Length];
         private readonly Tile[,] _grid = new Tile[GridWidth, GridHeight];
+        private Point? _doorTileIndices;
 
         public Point Origin { get; }
         public Point Size => new Point(GridWidth, GridHeight);
@@ -57,6 +61,42 @@ namespace Roguelike
         private void AddTile(ContentManager content, string assetName, TileType tileType)
         {
             _tileTextures[(int)tileType] = content.Load<Texture2D>(assetName);
+        }
+
+        public void LoadFromFile(string fileName)
+        {
+            int[] tileIds;
+            using (var stream = TitleContainer.OpenStream(fileName))
+            using (var streamReader = new StreamReader(stream))
+            {
+                var str = streamReader.ReadToEnd();
+                var splitSeparators = new[] { '[', ']', '\r', '\n' };
+                var tileIdStrs = str.Split(splitSeparators, StringSplitOptions.RemoveEmptyEntries);
+                tileIds = tileIdStrs.Select(int.Parse).ToArray();
+            }
+
+            if (tileIds.Length != GridWidth * GridHeight)
+                throw new InvalidDataException("Invalid level file, tile count mismatch");
+
+            for (int i = 0; i < tileIds.Length; ++i)
+            {
+                int x = i % GridWidth;
+                int y = i / GridWidth;
+                var tile = _grid[x, y];
+
+                tile.Type = (TileType)tileIds[i];
+                tile.Sprite = new Sprite(_tileTextures[tileIds[i]]);
+                tile.Sprite.Position = (Origin + new Point(TileSize * x, TileSize * y)).ToVector2();
+
+                if (tile.Type == TileType.WallDoorLocked)
+                    _doorTileIndices = new Point(x, 0);
+            }
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            foreach (var tile in _grid)
+                tile.Sprite.Draw(spriteBatch);
         }
     }
 }

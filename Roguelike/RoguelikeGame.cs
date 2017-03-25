@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Roguelike.Graphics;
 using System.Collections.Generic;
-using System;
 
 namespace Roguelike
 {
@@ -55,6 +54,8 @@ namespace Roguelike
             LoadUI();
 
             ConstructLightGrid();
+
+            _level.LoadFromFile("Content/Data/level_data.txt");
         }
 
         private void LoadUI()
@@ -192,9 +193,7 @@ namespace Roguelike
 
             _spriteBatch.Begin(transformMatrix: _scalingViewportAdapter.GetScaleMatrix());
 
-            var text = "MonoGame Font Test";
-            var textMiddlePoint = _font.MeasureString(text) / 2;
-            _spriteBatch.DrawString(_font, text, _screenCenter, Color.White, 0, textMiddlePoint, 1.0f, SpriteEffects.None, 0.5f);
+            _level.Draw(_spriteBatch);
 
             foreach (var sprite in _lightGrid)
                 sprite.Draw(_spriteBatch);

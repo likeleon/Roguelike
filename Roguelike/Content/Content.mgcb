@@ -611,3 +611,6 @@
 /processorParam:TextureFormat=Color
 /build:Tiles/spr_tile_wall_top_t.png
 
+#begin Data/level_data.txt
+/copy:Data/level_data.txt
+
