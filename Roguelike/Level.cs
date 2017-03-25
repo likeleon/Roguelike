@@ -23,6 +23,7 @@ namespace Roguelike
         public Point Origin { get; }
         public Point Size => new Point(GridWidth, GridHeight);
         public int TileSize { get; } = 50;
+        public IEnumerable<Torch> Torches => _torches;
 
         public Level(ContentManager content, Point screenSize)
         {

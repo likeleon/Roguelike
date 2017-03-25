@@ -183,6 +183,19 @@ namespace Roguelike
                 else if (distance < 250.0f)
                     tileAlpha = (51.0f * (distance - 200.0f)) / 10.0f;
 
+                foreach (var torch in _level.Torches)
+                {
+                    distance = Vector2.Distance(sprite.Position, torch.Position);
+                    if (distance < 100.0f)
+                    {
+                        var brightness = (tileAlpha - ((tileAlpha / 100.0f) * distance)) * torch.Brightness;
+                        tileAlpha -= brightness;
+                    }
+
+                    if (tileAlpha < 0.0f)
+                        tileAlpha = 0.0f;
+                }
+
                 sprite.Color = new Color(255, 255, 255, (int)tileAlpha);
             }
         }
