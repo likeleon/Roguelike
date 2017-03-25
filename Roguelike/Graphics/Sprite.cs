@@ -19,5 +19,7 @@ namespace Roguelike.Graphics
             spriteBatch.Draw(Texture, Position, LocalBounds, Color, 
                 Rotation, Origin, Scale, SpriteEffects.None, 0);
         }
+
+        public Rectangle TextureRect { get; internal set; }
     }
 }
