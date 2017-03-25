@@ -21,12 +21,13 @@ namespace Roguelike
         {
             _sprite = new Sprite(texture);
             FrameCount = frames;
-            _frameDuration = TimeSpan.FromMilliseconds(1000.0f / frameSpeed);
 
             var textureSize = texture.Bounds.Size;
             _frameSize = new Point(textureSize.X / FrameCount, textureSize.Y);
 
             IsAnimated = FrameCount > 1;
+            if (IsAnimated)
+                _frameDuration = TimeSpan.FromMilliseconds(1000.0f / frameSpeed);
 
             _sprite.Origin = _frameSize.ToVector2() / 2.0f;
         }

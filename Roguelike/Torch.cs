@@ -9,7 +9,7 @@ namespace Roguelike
         public float Brightness { get; set; } = 1.0f;
 
         public Torch(ContentManager content)
-            : base(content.Load<Texture2D>("spr_torch"))
+            : base(content.Load<Texture2D>("spr_torch"), frames: 5, frameSpeed: 12)
         {
         }
 
