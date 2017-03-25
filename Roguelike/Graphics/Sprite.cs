@@ -5,19 +5,18 @@ namespace Roguelike.Graphics
 {
     public sealed class Sprite : Transformable, IDrawable
     {
-        private readonly Texture2D _texture;
-
-        public Rectangle LocalBounds => _texture.Bounds;
+        public Texture2D Texture { get; }
+        public Rectangle LocalBounds => Texture.Bounds;
         public Color Color { get; set; } = Color.White;
 
         public Sprite(Texture2D texture)
         {
-            _texture = texture;
+            Texture = texture;
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_texture, Position, LocalBounds, Color, 
+            spriteBatch.Draw(Texture, Position, LocalBounds, Color, 
                 Rotation, Origin, Scale, SpriteEffects.None, 0);
         }
     }

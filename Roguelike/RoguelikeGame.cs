@@ -193,7 +193,7 @@ namespace Roguelike
 
             _spriteBatch.Begin(transformMatrix: _scalingViewportAdapter.GetScaleMatrix());
 
-            _level.Draw(_spriteBatch);
+            _level.Draw(_spriteBatch, gameTime);
 
             foreach (var sprite in _lightGrid)
                 sprite.Draw(_spriteBatch);
