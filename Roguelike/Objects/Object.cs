@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Roguelike.Graphics;
 using System;
 
-namespace Roguelike
+namespace Roguelike.Objects
 {
     public abstract class Object
     {

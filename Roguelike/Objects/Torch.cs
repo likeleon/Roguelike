@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Roguelike
+namespace Roguelike.Objects
 {
     public sealed class Torch : Object
     {

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Roguelike.Graphics;
+using Roguelike.Objects;
 using System;
 using System.Collections.Generic;
 using System.IO;
