@@ -41,11 +41,10 @@ namespace Roguelike
 
         protected override void Initialize()
         {
-            _camera = new Camera(_virtualSize);
-            _camera.Zoom = 2.0f;
-
-            var screenSize = new Point(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             _viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, _virtualSize);
+
+            _camera = new Camera(_viewportAdapter);
+            _camera.Zoom = 2.0f;
 
             base.Initialize();
         }
@@ -213,7 +212,7 @@ namespace Roguelike
         {
             GraphicsDevice.Clear(new Color(3, 3, 3, 225));
 
-            _spriteBatch.Begin(transformMatrix: _camera.TranslationMatrix * _viewportAdapter.GetScaleMatrix());
+            _spriteBatch.Begin(transformMatrix: _camera.GetViewMatrix());
 
             _level.Draw(_spriteBatch, gameTime);
 

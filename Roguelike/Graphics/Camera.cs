@@ -1,35 +1,41 @@
 ﻿using Microsoft.Xna.Framework;
+using Roguelike.ViewportAdapters;
 
 namespace Roguelike.Graphics
 {
     public sealed class Camera
     {
+        private readonly ViewportAdapter _viewportAdapter;
+
         public Vector2 Position { get; set; }
         public float Zoom { get; set; } = 1.0f;
         public float Rotation { get; set; }
-        public Point ViewportSize { get; }
-        public Vector2 ViewportCenter => ViewportSize.ToVector2() / 2.0f;
+        public Vector2 Origin { get; set; }
 
-        public Camera(Point viewportSize)
+        public Camera(ViewportAdapter viewportAdapter)
         {
-            ViewportSize = viewportSize;
+            _viewportAdapter = viewportAdapter;
+
+            Origin = viewportAdapter.VirtualSize.ToVector2() / 2.0f;
         }
 
-        public Matrix TranslationMatrix
+        public Matrix GetViewMatrix()
         {
-            get
-            {
-                return Matrix.CreateTranslation(-(int)Position.X, -(int)Position.Y, 0) *
-                    Matrix.CreateRotationZ(Rotation) *
-                    Matrix.CreateScale(new Vector3(Zoom, Zoom, 1)) *
-                    Matrix.CreateTranslation(new Vector3(ViewportCenter, 0));
-            }
+            return GetVirutalViewMatrix() * _viewportAdapter.GetScaleMatrix();
         }
 
-        public void Move(Vector2 offset) => Position += offset;
+        private Matrix GetVirutalViewMatrix()
+        {
+            return
+                Matrix.CreateTranslation(new Vector3(-Position, 0.0f)) *
+                Matrix.CreateRotationZ(Rotation) *
+                Matrix.CreateScale(Zoom, Zoom, 1) *
+                Matrix.CreateTranslation(new Vector3(Origin, 0.0f));
+        }
 
-        public void Rotate(float angle) => Rotation += angle;
-
-        public void AdjustZoom(float amount) => Zoom += amount;
+        public Matrix GetInverseViewMatrix()
+        {
+            return Matrix.Invert(GetViewMatrix());
+        }
     }
 }
