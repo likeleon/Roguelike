@@ -42,6 +42,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Graphics\IDrawable.cs" />
     <Compile Include="Graphics\ScalingViewportAdapter.cs" />
     <Compile Include="Graphics\Sprite.cs" />

@@ -1,25 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Roguelike.Graphics
 {
     public abstract class ViewportAdapter
     {
-        protected ViewportAdapter(GraphicsDevice graphicsDevice)
+        public Point ScreenSize { get; }
+        public Point VirtualSize { get; }
+        public Rectangle VirtualRectangle => new Rectangle(Point.Zero, VirtualSize);
+
+        protected ViewportAdapter(Point screenSize, Point virtualSize)
         {
-            GraphicsDevice = graphicsDevice;
+            ScreenSize = screenSize;
+            VirtualSize = virtualSize;
         }
-
-        public GraphicsDevice GraphicsDevice { get; }
-        public Viewport Viewport => GraphicsDevice.Viewport;
-
-        public abstract int VirtualWidth { get; }
-        public abstract int VirtualHeight { get; }
-        public abstract int ViewportWidth { get; }
-        public abstract int ViewportHeight { get; }
-
-        public Rectangle BoundingRectangle => new Rectangle(0, 0, VirtualWidth, VirtualHeight);
-        public Point Center => BoundingRectangle.Center;
 
         public abstract Matrix GetScaleMatrix();
 
@@ -27,10 +20,6 @@ namespace Roguelike.Graphics
         {
             var invertedScaleMatrix = Matrix.Invert(GetScaleMatrix());
             return Vector2.Transform(point.ToVector2(), invertedScaleMatrix).ToPoint();
-        }
-
-        public virtual void Reset()
-        {
         }
     }
 }
