@@ -11,6 +11,7 @@ namespace Roguelike
     {
         private readonly GraphicsDeviceManager _graphics;
         private readonly Point _virtualSize = new Point(1920, 1080);
+        private readonly Point _virtualCenter;
 
         private Camera _camera;
         private ViewportAdapter _viewportAdapter;
@@ -21,8 +22,6 @@ namespace Roguelike
 
         private readonly List<Sprite> _uiSprites = new List<Sprite>();
         private readonly List<Sprite> _lightGrid = new List<Sprite>();
-
-        private Vector2 VirtualCenter => _viewportAdapter.VirtualCenter.ToVector2();
 
         public RoguelikeGame()
         {
@@ -37,6 +36,8 @@ namespace Roguelike
 
             Window.AllowUserResizing = true;
             Window.Title = "Roguelike";
+
+            _virtualCenter = new Point(_virtualSize.X / 2, _virtualSize.Y / 2);
         }
 
         protected override void Initialize()
@@ -90,12 +91,12 @@ namespace Roguelike
             // Coin and Gem
             _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_gem_ui"))
             {
-                Position = new Vector2(VirtualCenter.X - 260.0f, 50.0f),
+                Position = new Vector2(_virtualCenter.X - 260.0f, 50.0f),
                 Origin = new Vector2(42.0f, 36.0f)
             });
             _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_coin_ui"))
             {
-                Position = new Vector2(VirtualCenter.X + 60.0f, 50.0f),
+                Position = new Vector2(_virtualCenter.X + 60.0f, 50.0f),
                 Origin = new Vector2(48.0f, 24.0f)
             });
 
@@ -111,31 +112,31 @@ namespace Roguelike
             _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_attack_ui"))
             {
                 Origin = new Vector2(16.0f, 16.0f),
-                Position = VirtualCenter - new Vector2(270.0f, 30.0f)
+                Position = new Vector2(_virtualCenter.X - 270.0f, _virtualSize.Y - 30.0f)
             });
 
             _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_defense_ui"))
             {
                 Origin = new Vector2(16.0f, 12.0f),
-                Position = VirtualCenter - new Vector2(150.0f, 30.0f)
+                Position = new Vector2(_virtualCenter.X - 150.0f, _virtualSize.Y - 30.0f)
             });
 
             _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_strength_ui"))
             {
                 Origin = new Vector2(22.0f, 12.0f),
-                Position = VirtualCenter - new Vector2(30.0f, 30.0f)
+                Position = new Vector2(_virtualCenter.X - 30.0f, _virtualSize.Y - 30.0f)
             });
 
             _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_dexterity_ui"))
             {
                 Origin = new Vector2(16.0f, 12.0f),
-                Position = VirtualCenter + new Vector2(90.0f, -30.0f)
+                Position = new Vector2(_virtualCenter.X + 90.0f, _virtualSize.Y - 30.0f)
             });
 
             _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_stamina_ui"))
             {
                 Origin = new Vector2(16.0f, 16.0f),
-                Position = VirtualCenter + new Vector2(210.0f, -30.0f)
+                Position = new Vector2(_virtualCenter.X + 210.0f, _virtualSize.Y - 30.0f)
             });
         }
 
@@ -170,7 +171,7 @@ namespace Roguelike
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            var playerPosition = VirtualCenter + new Vector2(197.0f, 410.0f);
+            var playerPosition = _virtualCenter.ToVector2() + new Vector2(197.0f, 410.0f);
 
             UpdateLight(playerPosition);
 
