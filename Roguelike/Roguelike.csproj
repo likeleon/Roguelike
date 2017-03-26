@@ -44,10 +44,12 @@
   <ItemGroup>
     <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Graphics\IDrawable.cs" />
-    <Compile Include="Graphics\ScalingViewportAdapter.cs" />
+    <Compile Include="ViewportAdapters\BoxingViewportAdapter.cs" />
+    <Compile Include="ViewportAdapters\DefaultViewportAdapter.cs" />
+    <Compile Include="ViewportAdapters\ScalingViewportAdapter.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Graphics\Transformable.cs" />
-    <Compile Include="Graphics\ViewportAdapter.cs" />
+    <Compile Include="ViewportAdapters\ViewportAdapter.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Object.cs" />
     <Compile Include="RandomGenerator.cs" />

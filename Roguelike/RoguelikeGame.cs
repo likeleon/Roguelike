@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Roguelike.Graphics;
+using Roguelike.ViewportAdapters;
 using System.Collections.Generic;
 
 namespace Roguelike
@@ -12,7 +13,7 @@ namespace Roguelike
         private readonly Point _virtualSize = new Point(1920, 1080);
 
         private Camera _camera;
-        private ScalingViewportAdapter _scalingViewportAdapter;
+        private ViewportAdapter _viewportAdapter;
 
         private SpriteBatch _spriteBatch;
         private SpriteFont _font;
@@ -21,7 +22,7 @@ namespace Roguelike
         private readonly List<Sprite> _uiSprites = new List<Sprite>();
         private readonly List<Sprite> _lightGrid = new List<Sprite>();
 
-        private Vector2 VirtualCenter => _virtualSize.ToVector2() / 2.0f;
+        private Vector2 VirtualCenter => _viewportAdapter.VirtualCenter.ToVector2();
 
         public RoguelikeGame()
         {
@@ -33,6 +34,8 @@ namespace Roguelike
             _graphics.SynchronizeWithVerticalRetrace = true;
 
             IsMouseVisible = false;
+
+            Window.AllowUserResizing = true;
             Window.Title = "Roguelike";
         }
 
@@ -42,7 +45,7 @@ namespace Roguelike
             _camera.Zoom = 2.0f;
 
             var screenSize = new Point(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            _scalingViewportAdapter = new ScalingViewportAdapter(screenSize, _virtualSize);
+            _viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, _virtualSize);
 
             base.Initialize();
         }
@@ -210,7 +213,7 @@ namespace Roguelike
         {
             GraphicsDevice.Clear(new Color(3, 3, 3, 225));
 
-            _spriteBatch.Begin(transformMatrix: _camera.TranslationMatrix * _scalingViewportAdapter.GetScaleMatrix());
+            _spriteBatch.Begin(transformMatrix: _camera.TranslationMatrix * _viewportAdapter.GetScaleMatrix());
 
             _level.Draw(_spriteBatch, gameTime);
 
@@ -219,7 +222,7 @@ namespace Roguelike
 
             _spriteBatch.End();
 
-            _spriteBatch.Begin(transformMatrix: _scalingViewportAdapter.GetScaleMatrix());
+            _spriteBatch.Begin(transformMatrix: _viewportAdapter.GetScaleMatrix());
 
             foreach (var sprite in _uiSprites)
                 sprite.Draw(_spriteBatch);
