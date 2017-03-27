@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace Roguelike.Objects
 {
@@ -29,7 +30,6 @@ namespace Roguelike.Objects
             SetSprite(Textures[(int)AnimationState.WalkUp], frames: 8, frameSpeed: 12);
             CurrentAnimationState = AnimationState.WalkUp;
             Sprite.Origin = new Vector2(13.0f, 18.0f);
-            Sprite.Scale = new Vector2(2.0f, 2.0f);
 
             Health = MaxHealth = 100;
             Mana = MaxMana = 50;
@@ -72,7 +72,11 @@ namespace Roguelike.Objects
                 animState = AnimationState.WalkDown;
             }
 
-            Position += movementSpeed;
+            if (movementSpeed.X != 0.0f && !CausesCollision(new Vector2(movementSpeed.X, 0.0f), level))
+                Position += new Vector2(movementSpeed.X, 0.0f);
+
+            if (movementSpeed.Y != 0.0f && !CausesCollision(new Vector2(0.0f, movementSpeed.Y), level))
+                Position += new Vector2(0.0f, movementSpeed.Y);
 
             Sprite.Position = Position;
 
@@ -100,6 +104,21 @@ namespace Roguelike.Objects
                     IsAnimated = true;
                 }
             }
+        }
+
+        private bool CausesCollision(Vector2 movement, Level level)
+        {
+            var newPosition = Position + movement;
+
+            var overlappingTiles = new Tile[]
+            {
+                level.GetTile(newPosition + new Vector2(-14.0f, -14.0f)),
+                level.GetTile(newPosition + new Vector2(+14.0f, -14.0f)),
+                level.GetTile(newPosition + new Vector2(-14.0f, +14.0f)),
+                level.GetTile(newPosition + new Vector2(+14.0f, +14.0f))
+            };
+
+            return overlappingTiles.Any(tile => level.IsSolid(tile.ColumnIndex, tile.RowIndex));
         }
     }
 }

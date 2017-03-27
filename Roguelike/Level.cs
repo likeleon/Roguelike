@@ -125,5 +125,35 @@ namespace Roguelike
             foreach (var torch in _torches)
                 torch.Draw(spriteBatch, gameTime);
         }
+
+        public Tile GetTile(Vector2 position)
+        {
+            position -= Origin.ToVector2();
+            var x = (int)position.X / TileSize;
+            var y = (int)position.Y / TileSize;
+            return _grid[x, y];
+        }
+
+        public bool IsSolid(int x, int y)
+        {
+            if (!TileIsValid(x, y))
+                return false;
+
+            var tileType = _grid[x, y].Type;
+            return tileType != TileType.Floor &&
+                tileType != TileType.FloorAlt &&
+                tileType != TileType.WallDoorUnlocked;
+        }
+
+        public bool TileIsValid(int x, int y)
+        {
+            if (x < 0 || x >= GridWidth)
+                return false;
+
+            if (y < 0 || y >= GridHeight)
+                return false;
+
+            return true;
+        }
     }
 }
