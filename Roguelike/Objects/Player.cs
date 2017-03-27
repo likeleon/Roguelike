@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System;
 
 namespace Roguelike.Objects
 {
@@ -38,6 +40,66 @@ namespace Roguelike.Objects
             Strength = 10;
             Dexterity = 10;
             Stamina = 10;
+        }
+
+        public void Update(GameTime gameTime, Level level)
+        {
+            var timeDelta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var movementSpeed = Vector2.Zero;
+            var previousPosition = Position;
+
+            var animState = CurrentAnimationState;
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            {
+                movementSpeed.X = -Speed * timeDelta;
+                animState = AnimationState.WalkLeft;
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            {
+                movementSpeed.X = Speed * timeDelta;
+                animState = AnimationState.WalkRight;
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            {
+                movementSpeed.Y = -Speed * timeDelta;
+                animState = AnimationState.WalkUp;
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.Down))
+            {
+                movementSpeed.Y = Speed * timeDelta;
+                animState = AnimationState.WalkDown;
+            }
+
+            Position += movementSpeed;
+
+            Sprite.Position = Position;
+
+            if (CurrentAnimationState != animState)
+            {
+                CurrentAnimationState = animState;
+                Sprite.SetTexture(Textures[(int)CurrentAnimationState]);
+            }
+
+            if (Velocity == Vector2.Zero)
+            {
+                if (IsAnimated)
+                {
+                    CurrentAnimationState += 4;
+                    Sprite.SetTexture(Textures[(int)CurrentAnimationState]);
+                    IsAnimated = false;
+                }
+            }
+            else
+            {
+                if (!IsAnimated)
+                {
+                    CurrentAnimationState -= 4;
+                    Sprite.SetTexture(Textures[(int)CurrentAnimationState]);
+                    IsAnimated = true;
+                }
+            }
         }
     }
 }

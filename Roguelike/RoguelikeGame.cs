@@ -175,7 +175,7 @@ namespace Roguelike
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            _player.Update(gameTime);
+            _player.Update(gameTime, _level);
 
             var playerPosition = _player.Position;
 
