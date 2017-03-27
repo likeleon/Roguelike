@@ -44,7 +44,10 @@
   <ItemGroup>
     <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Graphics\IDrawable.cs" />
+    <Compile Include="Objects\AnimationState.cs" />
     <Compile Include="Objects\Entity.cs" />
+    <Compile Include="Objects\Player.cs" />
+    <Compile Include="Utils.cs" />
     <Compile Include="ViewportAdapters\BoxingViewportAdapter.cs" />
     <Compile Include="ViewportAdapters\DefaultViewportAdapter.cs" />
     <Compile Include="ViewportAdapters\ScalingViewportAdapter.cs" />

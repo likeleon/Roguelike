@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Roguelike.Graphics;
+using Roguelike.Objects;
 using Roguelike.ViewportAdapters;
 using System.Collections.Generic;
 
@@ -19,6 +20,7 @@ namespace Roguelike
         private SpriteBatch _spriteBatch;
         private SpriteFont _font;
         private Level _level;
+        private Player _player;
 
         private readonly List<Sprite> _uiSprites = new List<Sprite>();
         private readonly List<Sprite> _lightGrid = new List<Sprite>();
@@ -56,13 +58,15 @@ namespace Roguelike
 
             _font = Content.Load<SpriteFont>("Fonts/ADDSBP__");
 
-            _level = new Level(Content, _virtualSize);
-
             LoadUI();
+
+            _level = new Level(Content, _virtualSize);
+            _level.LoadFromFile("Content/Data/level_data.txt");
 
             ConstructLightGrid();
 
-            _level.LoadFromFile("Content/Data/level_data.txt");
+            _player = new Player(Content);
+            _player.Position = _virtualCenter.ToVector2() + new Vector2(197.0f, 410.0f);
         }
 
         private void LoadUI()
@@ -171,7 +175,9 @@ namespace Roguelike
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            var playerPosition = _virtualCenter.ToVector2() + new Vector2(197.0f, 410.0f);
+            _player.Update(gameTime);
+
+            var playerPosition = _player.Position;
 
             UpdateLight(playerPosition);
 
@@ -216,6 +222,8 @@ namespace Roguelike
             _spriteBatch.Begin(transformMatrix: _camera.GetViewMatrix());
 
             _level.Draw(_spriteBatch, gameTime);
+
+            _player.Draw(_spriteBatch, gameTime);
 
             foreach (var sprite in _lightGrid)
                 sprite.Draw(_spriteBatch);

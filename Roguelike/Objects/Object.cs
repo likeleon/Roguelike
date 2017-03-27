@@ -7,19 +7,18 @@ namespace Roguelike.Objects
 {
     public abstract class Object
     {
-        private readonly Sprite _sprite;
-        private readonly TimeSpan _frameDuration;
-        private readonly Point _frameSize;
-
+        private TimeSpan _frameDuration;
+        private Point _frameSize;
         private bool _isAnimated;
         private int _currentFrame;
         private TimeSpan _timeDelta;
 
-        public int FrameCount { get; }
+        public int FrameCount { get; private set; }
+        protected Sprite Sprite { get; } = new Sprite();
 
-        public Object(Texture2D texture, int frames = 1, int frameSpeed = 0)
+        public void SetSprite(Texture2D texture, int frames = 1, int frameSpeed = 0)
         {
-            _sprite = new Sprite(texture);
+            Sprite.SetTexture(texture);
             FrameCount = frames;
 
             var textureSize = texture.Bounds.Size;
@@ -29,7 +28,7 @@ namespace Roguelike.Objects
             if (IsAnimated)
                 _frameDuration = TimeSpan.FromMilliseconds(1000.0f / frameSpeed);
 
-            _sprite.Origin = _frameSize.ToVector2() / 2.0f;
+            Sprite.Origin = _frameSize.ToVector2() / 2.0f;
         }
 
         public virtual void Update(GameTime gameTime)
@@ -48,19 +47,19 @@ namespace Roguelike.Objects
                     _timeDelta = TimeSpan.Zero;
                 }
             }
-            _sprite.Draw(spriteBatch);
+            Sprite.Draw(spriteBatch);
         }
 
         private void NextFrame()
         {
             _currentFrame = (_currentFrame + 1) % FrameCount;
-            _sprite.TextureRect = new Rectangle(new Point(_frameSize.X * _currentFrame, 0), _frameSize);
+            Sprite.TextureRect = new Rectangle(new Point(_frameSize.X * _currentFrame, 0), _frameSize);
         }
 
         public Vector2 Position
         {
-            get { return _sprite.Position; }
-            set { _sprite.Position = value; }
+            get { return Sprite.Position; }
+            set { Sprite.Position = value; }
         }
 
         public bool IsAnimated
@@ -72,7 +71,7 @@ namespace Roguelike.Objects
                 if (_isAnimated)
                     _currentFrame = 0;
                 else
-                    _sprite.TextureRect = new Rectangle(Point.Zero, _frameSize);
+                    Sprite.TextureRect = new Rectangle(Point.Zero, _frameSize);
             }
         }
     }
