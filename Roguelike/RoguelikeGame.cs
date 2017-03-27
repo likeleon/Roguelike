@@ -21,6 +21,7 @@ namespace Roguelike
         private SpriteFont _font;
         private Level _level;
         private Player _player;
+        private Sprite _animSprite;
 
         private readonly List<Sprite> _uiSprites = new List<Sprite>();
         private readonly List<Sprite> _lightGrid = new List<Sprite>();
@@ -67,6 +68,10 @@ namespace Roguelike
 
             _player = new Player(Content);
             _player.Position = _virtualCenter.ToVector2() + new Vector2(197.0f, 410.0f);
+
+            _animSprite = new Sprite(Content.Load<Texture2D>("UI/spr_aim"));
+            _animSprite.Origin = new Vector2(16.5f, 16.5f);
+            _animSprite.Scale = new Vector2(2.0f);
         }
 
         private void LoadUI()
@@ -175,7 +180,9 @@ namespace Roguelike
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            _player.Update(gameTime, _level);
+            _player.Update(gameTime, _level, _camera);
+
+            _animSprite.Position = _viewportAdapter.PointToScreen(Mouse.GetState().Position).ToVector2();
 
             var playerPosition = _player.Position;
 
@@ -231,6 +238,8 @@ namespace Roguelike
             _spriteBatch.End();
 
             _spriteBatch.Begin(transformMatrix: _viewportAdapter.GetScaleMatrix());
+
+            _animSprite.Draw(_spriteBatch);
 
             foreach (var sprite in _uiSprites)
                 sprite.Draw(_spriteBatch);

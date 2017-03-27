@@ -2,8 +2,9 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Roguelike.Graphics;
 using System.Collections.Generic;
-using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Roguelike.Objects
@@ -42,7 +43,7 @@ namespace Roguelike.Objects
             Stamina = 10;
         }
 
-        public void Update(GameTime gameTime, Level level)
+        public void Update(GameTime gameTime, Level level, Camera camera)
         {
             var timeDelta = (float)gameTime.ElapsedGameTime.TotalSeconds;
             var movementSpeed = Vector2.Zero;

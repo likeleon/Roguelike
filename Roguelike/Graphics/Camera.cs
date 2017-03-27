@@ -37,5 +37,19 @@ namespace Roguelike.Graphics
         {
             return Matrix.Invert(GetViewMatrix());
         }
+
+        public Vector2 WorldToScreen(Vector2 worldPosition)
+        {
+            var viewport = _viewportAdapter.Viewport;
+            var position = worldPosition + viewport.Bounds.Location.ToVector2();
+            return Vector2.Transform(position, GetViewMatrix());
+        }
+
+        public Vector2 ScreenToWorld(Vector2 screenPosition)
+        {
+            var viewport = _viewportAdapter.Viewport;
+            var position = screenPosition - viewport.Bounds.Location.ToVector2();
+            return Vector2.Transform(position, GetInverseViewMatrix());
+        }
     }
 }
