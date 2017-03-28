@@ -16,7 +16,7 @@ namespace Roguelike
         private static int GridHeight = 19;
 
         private readonly ContentManager _content;
-        private readonly Texture2D[] _tileTextures = new Texture2D[Utils.GetEnumLength<TileType>()];
+        private readonly Texture2D[] _tileTextures = new Texture2D[EnumExtensions.GetEnumLength<TileType>()];
         private readonly Tile[,] _grid = new Tile[GridWidth, GridHeight];
         private readonly List<Torch> _torches = new List<Torch>();
         private Point? _doorTileIndices;

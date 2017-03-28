@@ -34,6 +34,7 @@ namespace Roguelike
         private readonly List<Sprite> _uiSprites = new List<Sprite>();
         private readonly List<Sprite> _lightGrid = new List<Sprite>();
         private readonly List<Projectile> _playerProjectiles = new List<Projectile>();
+        private readonly List<Item> _items = new List<Item>();
 
         public RoguelikeGame()
         {
@@ -82,6 +83,8 @@ namespace Roguelike
             _aimSprite = new Sprite(Content.Load<Texture2D>("UI/spr_aim"));
             _aimSprite.Origin = new Vector2(16.5f, 16.5f);
             _aimSprite.Scale = new Vector2(2.0f);
+
+            PopulateLevel();
         }
 
         private void LoadUI()
@@ -193,6 +196,15 @@ namespace Roguelike
                 _lightGrid.Add(lightSprite);
             }
         }
+        
+        private void PopulateLevel()
+        {
+            var gold = new Gold(Content)
+            {
+                Position = _virtualCenter.ToVector2() - new Vector2(50.0f, 0.0f)
+            };
+            _items.Add(gold);
+        }
 
         protected override void UnloadContent()
         {
@@ -280,6 +292,9 @@ namespace Roguelike
             _spriteBatch.Begin(transformMatrix: _camera.GetViewMatrix());
 
             _level.Draw(_spriteBatch, gameTime);
+
+            foreach (var item in _items)
+                item.Draw(_spriteBatch, gameTime);
 
             foreach (var projectile in _playerProjectiles)
                 projectile.Draw(_spriteBatch, gameTime);

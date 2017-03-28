@@ -44,12 +44,16 @@
   <ItemGroup>
     <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Graphics\IDrawable.cs" />
+    <Compile Include="Objects\Gold.cs" />
+    <Compile Include="Objects\Item.cs" />
+    <Compile Include="Objects\ItemType.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="Objects\AnimationState.cs" />
     <Compile Include="Objects\Entity.cs" />
     <Compile Include="Objects\Player.cs" />
     <Compile Include="Objects\Projectile.cs" />
-    <Compile Include="Utils.cs" />
+    <Compile Include="Utils\EnumExtensions.cs" />
+    <Compile Include="Utils\StringExtensions.cs" />
     <Compile Include="ViewportAdapters\BoxingViewportAdapter.cs" />
     <Compile Include="ViewportAdapters\DefaultViewportAdapter.cs" />
     <Compile Include="ViewportAdapters\ScalingViewportAdapter.cs" />
