@@ -47,6 +47,7 @@
     <Compile Include="Objects\AnimationState.cs" />
     <Compile Include="Objects\Entity.cs" />
     <Compile Include="Objects\Player.cs" />
+    <Compile Include="Objects\Projectile.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="ViewportAdapters\BoxingViewportAdapter.cs" />
     <Compile Include="ViewportAdapters\DefaultViewportAdapter.cs" />

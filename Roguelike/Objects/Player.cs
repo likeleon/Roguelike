@@ -3,8 +3,8 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Roguelike.Graphics;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Roguelike.Objects
@@ -22,6 +22,17 @@ namespace Roguelike.Objects
             [AnimationState.IdleRight] = "spr_warrior_idle_right",
             [AnimationState.IdleLeft] = "spr_warrior_idle_left"
         };
+
+        private static readonly TimeSpan AttackDelay = TimeSpan.FromMilliseconds(250);
+
+        private TimeSpan _attackDelta;
+        private bool _isAttacking;
+
+        public bool IsAttacking
+        {
+            get { return _isAttacking; }
+            set { _isAttacking = value; _attackDelta = default(TimeSpan); }
+        }
 
         public Player(ContentManager content)
         {
@@ -105,6 +116,10 @@ namespace Roguelike.Objects
                     IsAnimated = true;
                 }
             }
+
+            _attackDelta += gameTime.ElapsedGameTime;
+            if (_attackDelta > AttackDelay && Keyboard.GetState().IsKeyDown(Keys.Space))
+                IsAttacking = true;
         }
 
         private bool CausesCollision(Vector2 movement, Level level)

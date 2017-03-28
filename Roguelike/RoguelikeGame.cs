@@ -19,12 +19,15 @@ namespace Roguelike
 
         private SpriteBatch _spriteBatch;
         private SpriteFont _font;
+        private Texture2D _projectileTexture;
+
         private Level _level;
         private Player _player;
         private Sprite _animSprite;
 
         private readonly List<Sprite> _uiSprites = new List<Sprite>();
         private readonly List<Sprite> _lightGrid = new List<Sprite>();
+        private readonly List<Projectile> _playerProjectiles = new List<Projectile>();
 
         public RoguelikeGame()
         {
@@ -58,6 +61,7 @@ namespace Roguelike
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _font = Content.Load<SpriteFont>("Fonts/ADDSBP__");
+            _projectileTexture = Content.Load<Texture2D>("Projectiles/spr_sword");
 
             LoadUI();
 
@@ -186,7 +190,22 @@ namespace Roguelike
 
             var playerPosition = _player.Position;
 
+            if (_player.IsAttacking)
+            {
+                _player.IsAttacking = false;
+                if (_player.Mana >= 2)
+                {
+                    var target = _camera.ScreenToWorld(Mouse.GetState().Position.ToVector2());
+                    var projectile = new Projectile(_projectileTexture, playerPosition, target);
+                    _playerProjectiles.Add(projectile);
+
+                    _player.Mana -= 2;
+                }
+            }
+
             UpdateLight(playerPosition);
+
+            UpdateProjectiles(gameTime);
 
             _camera.Position = playerPosition;
 
@@ -222,6 +241,12 @@ namespace Roguelike
             }
         }
 
+        private void UpdateProjectiles(GameTime gameTime)
+        {
+            foreach (var projectile in _playerProjectiles)
+                projectile.Update(gameTime);
+        }
+
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(new Color(3, 3, 3, 225));
@@ -229,6 +254,9 @@ namespace Roguelike
             _spriteBatch.Begin(transformMatrix: _camera.GetViewMatrix());
 
             _level.Draw(_spriteBatch, gameTime);
+
+            foreach (var projectile in _playerProjectiles)
+                projectile.Draw(_spriteBatch, gameTime);
 
             _player.Draw(_spriteBatch, gameTime);
 
