@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Graphics\IDrawable.cs" />
+    <Compile Include="Order.cs" />
     <Compile Include="Objects\AnimationState.cs" />
     <Compile Include="Objects\Entity.cs" />
     <Compile Include="Objects\Player.cs" />

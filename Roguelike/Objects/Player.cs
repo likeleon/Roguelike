@@ -62,23 +62,23 @@ namespace Roguelike.Objects
 
             var animState = CurrentAnimationState;
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            if (Order.IsOrderIssued(OrderType.MoveLeft))
             {
                 movementSpeed.X = -Speed * timeDelta;
                 animState = AnimationState.WalkLeft;
             }
-            else if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            else if (Order.IsOrderIssued(OrderType.MoveRight))
             {
                 movementSpeed.X = Speed * timeDelta;
                 animState = AnimationState.WalkRight;
             }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            if (Order.IsOrderIssued(OrderType.MoveUp))
             {
                 movementSpeed.Y = -Speed * timeDelta;
                 animState = AnimationState.WalkUp;
             }
-            else if (Keyboard.GetState().IsKeyDown(Keys.Down))
+            else if (Order.IsOrderIssued(OrderType.MoveDown))
             {
                 movementSpeed.Y = Speed * timeDelta;
                 animState = AnimationState.WalkDown;
@@ -118,7 +118,7 @@ namespace Roguelike.Objects
             }
 
             _attackDelta += gameTime.ElapsedGameTime;
-            if (_attackDelta > AttackDelay && Keyboard.GetState().IsKeyDown(Keys.Space))
+            if (_attackDelta > AttackDelay && Order.IsOrderIssued(OrderType.Attack))
                 IsAttacking = true;
         }
 
