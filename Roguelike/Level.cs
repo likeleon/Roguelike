@@ -21,6 +21,9 @@ namespace Roguelike
         private readonly List<Torch> _torches = new List<Torch>();
         private Point? _doorTileIndices;
 
+        public int FloorNumber => 1;
+        public int RoomNumber => 0;
+
         public Point Origin { get; }
         public Point Size => new Point(GridWidth, GridHeight);
         public int TileSize { get; } = 50;

@@ -5,6 +5,7 @@ using Roguelike.Graphics;
 using Roguelike.Objects;
 using Roguelike.ViewportAdapters;
 using System.Collections.Generic;
+using System;
 
 namespace Roguelike
 {
@@ -23,7 +24,12 @@ namespace Roguelike
 
         private Level _level;
         private Player _player;
-        private Sprite _animSprite;
+        private Sprite _aimSprite;
+        private Sprite _healthBarSprite;
+        private Sprite _manaBarSprite;
+
+        private int _scoreTotal;
+        private int _goldTotal;
 
         private readonly List<Sprite> _uiSprites = new List<Sprite>();
         private readonly List<Sprite> _lightGrid = new List<Sprite>();
@@ -73,9 +79,9 @@ namespace Roguelike
             _player = new Player(Content);
             _player.Position = _virtualCenter.ToVector2() + new Vector2(197.0f, 410.0f);
 
-            _animSprite = new Sprite(Content.Load<Texture2D>("UI/spr_aim"));
-            _animSprite.Origin = new Vector2(16.5f, 16.5f);
-            _animSprite.Scale = new Vector2(2.0f);
+            _aimSprite = new Sprite(Content.Load<Texture2D>("UI/spr_aim"));
+            _aimSprite.Origin = new Vector2(16.5f, 16.5f);
+            _aimSprite.Scale = new Vector2(2.0f);
         }
 
         private void LoadUI()
@@ -87,7 +93,7 @@ namespace Roguelike
                 Origin = new Vector2(30.0f, 30.0f)
             });
 
-            // Bars
+            // Bar outlines
             var barOutlineTexture = Content.Load<Texture2D>("UI/spr_bar_outline");
             var barOutlineTextureOrigin = barOutlineTexture.Bounds.Size.ToVector2() / 2.0f;
             _uiSprites.Add(new Sprite(barOutlineTexture)
@@ -100,6 +106,20 @@ namespace Roguelike
                 Position = new Vector2(205.0f, 55.0f),
                 Origin = barOutlineTextureOrigin
             });
+
+            // Bars
+            var healthBarTexture = Content.Load<Texture2D>("UI/spr_health_bar");
+            var barTextureOrigin = healthBarTexture.Bounds.Size.ToVector2() / 2.0f;
+            _healthBarSprite = new Sprite(healthBarTexture)
+            {
+                Position = new Vector2(205.0f, 35.0f),
+                Origin = barTextureOrigin
+            };
+            _manaBarSprite = new Sprite(Content.Load<Texture2D>("UI/spr_mana_bar"))
+            {
+                Position = new Vector2(205.0f, 55.0f),
+                Origin = barTextureOrigin
+            };
 
             // Coin and Gem
             _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_gem_ui"))
@@ -186,7 +206,7 @@ namespace Roguelike
 
             _player.Update(gameTime, _level, _camera);
 
-            _animSprite.Position = _viewportAdapter.PointToScreen(Mouse.GetState().Position).ToVector2();
+            _aimSprite.Position = _viewportAdapter.PointToScreen(Mouse.GetState().Position).ToVector2();
 
             var playerPosition = _player.Position;
 
@@ -273,14 +293,43 @@ namespace Roguelike
 
             _spriteBatch.Begin(transformMatrix: _viewportAdapter.GetScaleMatrix());
 
-            _animSprite.Draw(_spriteBatch);
+            _aimSprite.Draw(_spriteBatch);
+
+            DrawString(_player.Attack.ToString(), new Vector2(_virtualCenter.X - 210.0f, _virtualSize.Y - 25.0f), 1.5f);
+            DrawString(_player.Defense.ToString(), new Vector2(_virtualCenter.X - 90.0f, _virtualSize.Y - 25.0f), 1.5f);
+            DrawString(_player.Strength.ToString(), new Vector2(_virtualCenter.X + 30.0f, _virtualSize.Y - 25.0f), 1.5f);
+            DrawString(_player.Dexterity.ToString(), new Vector2(_virtualCenter.X + 150.0f, _virtualSize.Y - 25.0f), 1.5f);
+            DrawString(_player.Stamina.ToString(), new Vector2(_virtualCenter.X + 270.0f, _virtualSize.Y - 25.0f), 1.5f);
+
+            DrawString(_scoreTotal.ToString().PadLeft(6, '0'), new Vector2(_virtualCenter.X - 120.0f, 50.0f), 2.0f);
+            DrawString(_goldTotal.ToString().PadLeft(6, '0'), new Vector2(_virtualCenter.X + 220.0f, 50.0f), 2.0f);
 
             foreach (var sprite in _uiSprites)
                 sprite.Draw(_spriteBatch);
 
+            DrawString($"Floor {_level.FloorNumber}", new Vector2(70.0f, _virtualSize.Y - 60.0f), 1.5f);
+            DrawString($"Room {_level.RoomNumber}", new Vector2(70.0f, _virtualSize.Y - 25.0f), 1.5f);
+
+            _healthBarSprite.TextureRect = new Rectangle(0, 0, (int)(213.0f / _player.MaxHealth * _player.Health), 8);
+            _healthBarSprite.Draw(_spriteBatch);
+
+            _manaBarSprite.TextureRect = new Rectangle(0, 0, (int)(213.0f / _player.MaxMana * _player.Mana), 8);
+            _manaBarSprite.Draw(_spriteBatch);
+
             _spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        private void DrawString(string text, Vector2 position, float scale)
+        {
+            var textSize = _font.MeasureString(text);
+            _spriteBatch.DrawString(_font, text, position, Color.White, 
+                rotation: 0.0f, 
+                origin: textSize / 2.0f, 
+                scale: scale, 
+                effects: SpriteEffects.None, 
+                layerDepth: 0.0f);
         }
     }
 }
