@@ -243,8 +243,14 @@ namespace Roguelike
 
         private void UpdateProjectiles(GameTime gameTime)
         {
-            foreach (var projectile in _playerProjectiles)
-                projectile.Update(gameTime);
+            for (int i = _playerProjectiles.Count - 1; i >= 0; --i)
+            {
+                var projectileTileType = _level.GetTile(_playerProjectiles[i].Position).Type;
+                if (projectileTileType != TileType.Floor && projectileTileType != TileType.FloorAlt)
+                    _playerProjectiles.RemoveAt(i);
+                else
+                    _playerProjectiles[i].Update(gameTime);
+            }
         }
 
         protected override void Draw(GameTime gameTime)
