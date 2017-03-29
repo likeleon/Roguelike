@@ -44,9 +44,12 @@
   <ItemGroup>
     <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Graphics\IDrawable.cs" />
-    <Compile Include="Objects\Gold.cs" />
-    <Compile Include="Objects\Item.cs" />
-    <Compile Include="Objects\ItemType.cs" />
+    <Compile Include="Objects\Enemies\Enemy.cs" />
+    <Compile Include="Objects\Enemies\Humanoid.cs" />
+    <Compile Include="Objects\Enemies\Slime.cs" />
+    <Compile Include="Objects\Items\Gold.cs" />
+    <Compile Include="Objects\Items\Item.cs" />
+    <Compile Include="Objects\Items\ItemType.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="Objects\AnimationState.cs" />
     <Compile Include="Objects\Entity.cs" />

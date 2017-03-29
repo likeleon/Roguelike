@@ -15,7 +15,7 @@ namespace Roguelike.Objects
 
         public override void Update(GameTime gameTime)
         {
-            Brightness = RandomGenerator.Next(80, 120) / 100.0f;
+            Brightness = RandomGenerator.Next(80, 121) / 100.0f;
         }
     }
 }

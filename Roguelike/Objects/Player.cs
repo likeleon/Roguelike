@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Roguelike.Graphics;
 using System;
 using System.Collections.Generic;
@@ -24,14 +23,25 @@ namespace Roguelike.Objects
         };
 
         private static readonly TimeSpan AttackDelay = TimeSpan.FromMilliseconds(250);
+        private static readonly TimeSpan TakeDamageDelay = TimeSpan.FromSeconds(1);
+        private static readonly TimeSpan ManaRegenDelay = TimeSpan.FromMilliseconds(200);
 
         private TimeSpan _attackDelta;
         private bool _isAttacking;
+        private TimeSpan _takeDamageDelta;
+        private bool _canTakeDamage = true;
+        private TimeSpan _manaRegenDelta;
 
         public bool IsAttacking
         {
             get { return _isAttacking; }
             set { _isAttacking = value; _attackDelta = default(TimeSpan); }
+        }
+
+        public bool CanTakeDamage
+        {
+            get { return _canTakeDamage; }
+            set { _canTakeDamage = value; _takeDamageDelta = default(TimeSpan); }
         }
 
         public Player(ContentManager content)
@@ -120,6 +130,20 @@ namespace Roguelike.Objects
             _attackDelta += gameTime.ElapsedGameTime;
             if (_attackDelta > AttackDelay && Order.IsOrderIssued(OrderType.Attack))
                 IsAttacking = true;
+
+            if (!CanTakeDamage)
+            {
+                _takeDamageDelta += gameTime.ElapsedGameTime;
+                if (_takeDamageDelta > TakeDamageDelay)
+                    CanTakeDamage = true;
+            }
+
+            _manaRegenDelta += gameTime.ElapsedGameTime;
+            if (_manaRegenDelta > ManaRegenDelay)
+            {
+                Mana += 1;
+                _manaRegenDelta = default(TimeSpan);
+            }
         }
 
         private bool CausesCollision(Vector2 movement, Level level)
@@ -135,6 +159,12 @@ namespace Roguelike.Objects
             };
 
             return overlappingTiles.Any(tile => level.IsSolid(tile.ColumnIndex, tile.RowIndex));
+        }
+
+        public void TakeDamage(int damage)
+        {
+            Health -= damage;
+            CanTakeDamage = false;
         }
     }
 }

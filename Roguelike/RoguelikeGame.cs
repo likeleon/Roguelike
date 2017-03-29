@@ -35,6 +35,7 @@ namespace Roguelike
         private readonly List<Sprite> _lightGrid = new List<Sprite>();
         private readonly List<Projectile> _playerProjectiles = new List<Projectile>();
         private readonly List<Item> _items = new List<Item>();
+        private readonly List<Enemy> _enemies = new List<Enemy>();
 
         public RoguelikeGame()
         {
@@ -199,11 +200,20 @@ namespace Roguelike
         
         private void PopulateLevel()
         {
-            var gold = new Gold(Content)
+            _items.Add(new Gold(Content)
             {
                 Position = _virtualCenter.ToVector2() - new Vector2(50.0f, 0.0f)
-            };
-            _items.Add(gold);
+            });
+
+            _enemies.Add(new Humanoid(Content)
+            {
+                Position = _player.Position - new Vector2(50.0f, 0.0f)
+            });
+
+            _enemies.Add(new Slime(Content)
+            {
+                Position = _player.Position + new Vector2(50.0f, 0.0f)
+            });
         }
 
         protected override void UnloadContent()
@@ -236,6 +246,8 @@ namespace Roguelike
             }
 
             UpdateLight(playerPosition);
+
+            UpdateEnemies(gameTime);
 
             UpdateProjectiles(gameTime);
 
@@ -273,6 +285,73 @@ namespace Roguelike
             }
         }
 
+        private void UpdateEnemies(GameTime gameTime)
+        {
+            var playerTile = _level.GetTile(_player.Position);
+
+            for (int i = _enemies.Count - 1; i >= 0; --i)
+            {
+                var enemy = _enemies[i];
+
+                var enemyTile = _level.GetTile(enemy.Position);
+                if (enemyTile == playerTile && _player.CanTakeDamage)
+                    _player.TakeDamage(10);
+
+                foreach (var projectile in _playerProjectiles)
+                {
+                    if (enemyTile != _level.GetTile(projectile.Position))
+                        continue;
+
+                    enemy.TakeDamage(25);
+
+                    if (!enemy.IsDead)
+                        continue;
+
+                    var position = enemy.Position;
+                    for (int j = 0; j < 5; ++j)
+                    {
+                        position.X += RandomGenerator.Next(-15, 16);
+                        position.Y += RandomGenerator.Next(-15, 16);
+                        var itemType = RandomGenerator.Next(0, 2) == 0 ? ItemType.Gold : ItemType.Gem;
+                        SpawnItem(itemType, position);
+                    }
+
+                    if (RandomGenerator.Next(5) == 0)
+                    {
+                        position.X += RandomGenerator.Next(-15, 16);
+                        position.Y += RandomGenerator.Next(-15, 16);
+                        SpawnItem(ItemType.Heart, position);
+                    }
+                    else if (RandomGenerator.Next(5) == 1)
+                    {
+                        position.X += RandomGenerator.Next(-15, 16);
+                        position.Y += RandomGenerator.Next(-15, 16);
+                        SpawnItem(ItemType.Potion, position);
+                    }
+
+                    _enemies.RemoveAt(i);
+                    break;
+                }
+            }
+        }
+
+        private void SpawnItem(ItemType itemType, Vector2 position)
+        {
+            Item item = null;
+            switch (itemType)
+            {
+                case ItemType.Gold:
+                    item = new Gold(Content);
+                    break;
+
+                default:
+                    return;
+            }
+
+            item.Position = position;
+            _items.Add(item);
+        }
+
         private void UpdateProjectiles(GameTime gameTime)
         {
             for (int i = _playerProjectiles.Count - 1; i >= 0; --i)
@@ -295,6 +374,9 @@ namespace Roguelike
 
             foreach (var item in _items)
                 item.Draw(_spriteBatch, gameTime);
+
+            foreach (var enemy in _enemies)
+                enemy.Draw(_spriteBatch, gameTime);
 
             foreach (var projectile in _playerProjectiles)
                 projectile.Draw(_spriteBatch, gameTime);
