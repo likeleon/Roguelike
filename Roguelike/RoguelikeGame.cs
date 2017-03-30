@@ -5,7 +5,6 @@ using Roguelike.Graphics;
 using Roguelike.Objects;
 using Roguelike.ViewportAdapters;
 using System.Collections.Generic;
-using System;
 
 namespace Roguelike
 {
@@ -245,6 +244,8 @@ namespace Roguelike
                 }
             }
 
+            UpdateItems(playerPosition);
+
             UpdateLight(playerPosition);
 
             UpdateEnemies(gameTime);
@@ -254,6 +255,24 @@ namespace Roguelike
             _camera.Position = playerPosition;
 
             base.Update(gameTime);
+        }
+
+        private void UpdateItems(Vector2 playerPosition)
+        {
+            for (int i = _items.Count - 1; i >= 0; --i)
+            {
+                var item = _items[i];
+                if (Vector2.Distance(item.Position, playerPosition) > 40.0f)
+                    continue;
+
+                switch (item.ItemType)
+                {
+                    case ItemType.Gold:
+                        _goldTotal += ((Gold)item).GoldValue;
+                        break;
+                }
+                _items.RemoveAt(i);
+            }
         }
 
         private void UpdateLight(Vector2 playerPosition)

@@ -14,7 +14,7 @@ namespace Roguelike.Objects
 
         protected Item(ItemType itemType)
         {
-            ItemType = ItemType;
+            ItemType = itemType;
         }
 
         protected void SetName(string name, SpriteFont font)
