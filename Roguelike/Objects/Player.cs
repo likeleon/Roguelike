@@ -100,8 +100,6 @@ namespace Roguelike.Objects
             if (movementSpeed.Y != 0.0f && !CausesCollision(new Vector2(0.0f, movementSpeed.Y), level))
                 Position += new Vector2(0.0f, movementSpeed.Y);
 
-            Sprite.Position = Position;
-
             if (CurrentAnimationState != animState)
             {
                 CurrentAnimationState = animState;

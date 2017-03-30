@@ -10,7 +10,6 @@ namespace Roguelike.Objects
         public Projectile(Texture2D texture, Vector2 origin, Vector2 target)
         {
             SetSprite(texture);
-            Sprite.Position = origin;
             Position = origin;
 
             _velocity = Vector2.Normalize(target - origin);
@@ -22,8 +21,7 @@ namespace Roguelike.Objects
 
             Sprite.Rotation += 400.0f * timeDelta;
 
-            Sprite.Position += _velocity * 500.0f * timeDelta;
-            Position = Sprite.Position;
+            Position += _velocity * 500.0f * timeDelta;
         }
     }
 }
