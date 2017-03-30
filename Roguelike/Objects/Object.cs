@@ -26,7 +26,10 @@ namespace Roguelike.Objects
 
             IsAnimated = FrameCount > 1;
             if (IsAnimated)
+            {
                 _frameDuration = TimeSpan.FromMilliseconds(1000.0f / frameSpeed);
+                Sprite.TextureRect = new Rectangle(Point.Zero, _frameSize);
+            }
 
             Sprite.Origin = _frameSize.ToVector2() / 2.0f;
         }
