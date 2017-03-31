@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Roguelike.Graphics;
 using Roguelike.Objects;
+using Roguelike.Utils;
 using Roguelike.ViewportAdapters;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,9 @@ namespace Roguelike
 {
     public class RoguelikeGame : Game
     {
+        private static readonly int MaxItemSpawnCount = 50;
+        private static readonly int MaxEnemySpawnCount = 20;
+
         private readonly GraphicsDeviceManager _graphics;
         private readonly Point _virtualSize = new Point(1920, 1080);
         private readonly Point _virtualCenter;
@@ -202,17 +206,22 @@ namespace Roguelike
         
         private void PopulateLevel()
         {
-            SpawnItem(ItemType.Key, _virtualCenter.ToVector2() + new Vector2(50.0f, 0.0f));
-            SpawnItem(ItemType.Gold, _virtualCenter.ToVector2() - new Vector2(50.0f, 0.0f));
-
-            _enemies.Add(new Humanoid(Content)
+            MaxItemSpawnCount.Times(() =>
             {
-                Position = _player.Position - new Vector2(50.0f, 0.0f)
+                if (RandomGenerator.Next(2) == 1)
+                {
+                    var itemType = (ItemType)RandomGenerator.Next(2);
+                    SpawnItem(itemType);
+                }
             });
 
-            _enemies.Add(new Slime(Content)
+            MaxEnemySpawnCount.Times(() =>
             {
-                Position = _player.Position + new Vector2(50.0f, 0.0f)
+                if (RandomGenerator.Next(2) == 1)
+                {
+                    var enemyType = (EnemyType)RandomGenerator.Next(EnumExtensions.GetEnumLength<EnemyType>());
+                    SpawnEnemy(enemyType);
+                }
             });
         }
 
@@ -368,7 +377,7 @@ namespace Roguelike
             }
         }
 
-        private void SpawnItem(ItemType itemType, Vector2 position)
+        private void SpawnItem(ItemType itemType, Vector2? position = null)
         {
             Item item = null;
             switch (itemType)
@@ -385,6 +394,10 @@ namespace Roguelike
                     item = new Heart(Content);
                     break;
 
+                case ItemType.Potion:
+                    item = new Potion(Content);
+                    break;
+
                 case ItemType.Key:
                     item = new Key(Content, _font);
                     break;
@@ -393,8 +406,29 @@ namespace Roguelike
                     throw new InvalidOperationException($"Unable to create an item with type '{itemType}'");
             }
 
-            item.Position = position;
+            item.Position = position ?? _level.GetRandomSpawnLocation();
             _items.Add(item);
+        }
+
+        private void SpawnEnemy(EnemyType enemyType, Vector2? position = null)
+        {
+            Enemy enemy = null;
+            switch (enemyType)
+            {
+                case EnemyType.Slime:
+                    enemy = new Slime(Content);
+                    break;
+
+                case EnemyType.Humanoid:
+                    enemy = new Humanoid(Content);
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"Unable to create an enemy with type '{enemyType}'");
+            }
+
+            enemy.Position = position ?? _level.GetRandomSpawnLocation();
+            _enemies.Add(enemy);
         }
 
         private void UpdateProjectiles(GameTime gameTime)

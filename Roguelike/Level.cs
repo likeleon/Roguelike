@@ -176,5 +176,33 @@ namespace Roguelike
 
             SetTile(_doorTileIndices.Value, TileType.WallDoorUnlocked);
         }
+
+        public Vector2 GetRandomSpawnLocation()
+        {
+            var tileIndex = Point.Zero;
+            while (!IsFloor(tileIndex))
+            {
+                tileIndex = new Point(RandomGenerator.Next(GridWidth), RandomGenerator.Next(GridHeight));
+            }
+
+            var tileLocation = GetActualTileLocation(tileIndex);
+            tileLocation.X += RandomGenerator.Next(-10, 11);
+            tileLocation.Y += RandomGenerator.Next(-10, 11);
+
+            return tileLocation;
+        }
+
+        public bool IsFloor(Point tileIndex)
+        {
+            var tileType = _grid[tileIndex.X, tileIndex.Y].Type;
+            return tileType == TileType.Floor || tileType == TileType.FloorAlt;
+        }
+
+        private Vector2 GetActualTileLocation(Point tileIndex)
+        {
+            return new Vector2(
+                x: Origin.X + (tileIndex.X * TileSize) + (TileSize / 2),
+                y: Origin.Y + (tileIndex.Y * TileSize) + (TileSize / 2));
+        }
     }
 }
