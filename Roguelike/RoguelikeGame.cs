@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using Roguelike.Graphics;
 using Roguelike.Objects;
 using Roguelike.ViewportAdapters;
+using System;
 using System.Collections.Generic;
 
 namespace Roguelike
@@ -26,6 +27,7 @@ namespace Roguelike
         private Sprite _aimSprite;
         private Sprite _healthBarSprite;
         private Sprite _manaBarSprite;
+        private Sprite _keyUiSprite;
 
         private int _scoreTotal;
         private int _goldTotal;
@@ -137,12 +139,13 @@ namespace Roguelike
             });
 
             // Key pickup
-            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_key_ui"))
+            _keyUiSprite = new Sprite(Content.Load<Texture2D>("UI/spr_key_ui"))
             {
                 Position = _virtualSize.ToVector2() - new Vector2(120.0f, 70.0f),
                 Origin = new Vector2(90.0f, 45.0f),
                 Color = new Color(255, 255, 255, 60)
-            });
+            };
+            _uiSprites.Add(_keyUiSprite);
 
             // Stats
             _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_attack_ui"))
@@ -199,6 +202,7 @@ namespace Roguelike
         
         private void PopulateLevel()
         {
+            SpawnItem(ItemType.Key, _virtualCenter.ToVector2() + new Vector2(50.0f, 0.0f));
             SpawnItem(ItemType.Gold, _virtualCenter.ToVector2() - new Vector2(50.0f, 0.0f));
 
             _enemies.Add(new Humanoid(Content)
@@ -274,6 +278,11 @@ namespace Roguelike
 
                     case ItemType.Heart:
                         _player.Health += ((Heart)item).Health;
+                        break;
+
+                    case ItemType.Key:
+                        _level.UnlockDoor();
+                        _keyUiSprite.Color = Color.White;
                         break;
                 }
                 _items.RemoveAt(i);
@@ -376,8 +385,12 @@ namespace Roguelike
                     item = new Heart(Content);
                     break;
 
+                case ItemType.Key:
+                    item = new Key(Content, _font);
+                    break;
+
                 default:
-                    return;
+                    throw new InvalidOperationException($"Unable to create an item with type '{itemType}'");
             }
 
             item.Position = position;

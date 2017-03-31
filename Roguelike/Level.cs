@@ -33,31 +33,31 @@ namespace Roguelike
         {
             _content = content;
 
-            AddTile("Tiles/spr_tile_floor", TileType.Floor);
+            SetTileTexture("Tiles/spr_tile_floor", TileType.Floor);
 
-            AddTile("Tiles/spr_tile_wall_top", TileType.WallTop);
-            AddTile("Tiles/spr_tile_wall_top_left", TileType.WallTopLeft);
-            AddTile("Tiles/spr_tile_wall_top_right", TileType.WallTopRight);
-            AddTile("Tiles/spr_tile_wall_top_t", TileType.WallTopT);
-            AddTile("Tiles/spr_tile_wall_top_end", TileType.WallTopEnd);
+            SetTileTexture("Tiles/spr_tile_wall_top", TileType.WallTop);
+            SetTileTexture("Tiles/spr_tile_wall_top_left", TileType.WallTopLeft);
+            SetTileTexture("Tiles/spr_tile_wall_top_right", TileType.WallTopRight);
+            SetTileTexture("Tiles/spr_tile_wall_top_t", TileType.WallTopT);
+            SetTileTexture("Tiles/spr_tile_wall_top_end", TileType.WallTopEnd);
 
-            AddTile("Tiles/spr_tile_wall_bottom_left", TileType.WallBottomLeft);
-            AddTile("Tiles/spr_tile_wall_bottom_right", TileType.WallBottomRight);
-            AddTile("Tiles/spr_tile_wall_bottom_t", TileType.WallBottomT);
-            AddTile("Tiles/spr_tile_wall_bottom_end", TileType.WallBottomEnd);
+            SetTileTexture("Tiles/spr_tile_wall_bottom_left", TileType.WallBottomLeft);
+            SetTileTexture("Tiles/spr_tile_wall_bottom_right", TileType.WallBottomRight);
+            SetTileTexture("Tiles/spr_tile_wall_bottom_t", TileType.WallBottomT);
+            SetTileTexture("Tiles/spr_tile_wall_bottom_end", TileType.WallBottomEnd);
 
-            AddTile("Tiles/spr_tile_wall_side", TileType.WallSide);
-            AddTile("Tiles/spr_tile_wall_side_left_t", TileType.WallSideLeftT);
-            AddTile("Tiles/spr_tile_wall_side_left_end", TileType.WallSideLeftEnd);
-            AddTile("Tiles/spr_tile_wall_side_right_t", TileType.WallSideRightT);
-            AddTile("Tiles/spr_tile_wall_side_right_end", TileType.WallSideRightEnd);
+            SetTileTexture("Tiles/spr_tile_wall_side", TileType.WallSide);
+            SetTileTexture("Tiles/spr_tile_wall_side_left_t", TileType.WallSideLeftT);
+            SetTileTexture("Tiles/spr_tile_wall_side_left_end", TileType.WallSideLeftEnd);
+            SetTileTexture("Tiles/spr_tile_wall_side_right_t", TileType.WallSideRightT);
+            SetTileTexture("Tiles/spr_tile_wall_side_right_end", TileType.WallSideRightEnd);
 
-            AddTile("Tiles/spr_tile_wall_intersection", TileType.WallIntersection);
-            AddTile("Tiles/spr_tile_wall_single", TileType.WallSingle);
+            SetTileTexture("Tiles/spr_tile_wall_intersection", TileType.WallIntersection);
+            SetTileTexture("Tiles/spr_tile_wall_single", TileType.WallSingle);
 
-            AddTile("Tiles/spr_tile_wall_entrance", TileType.WallEntrance);
-            AddTile("Tiles/spr_tile_door_locked", TileType.WallDoorLocked);
-            AddTile("Tiles/spr_tile_door_unlocked", TileType.WallDoorUnlocked);
+            SetTileTexture("Tiles/spr_tile_wall_entrance", TileType.WallEntrance);
+            SetTileTexture("Tiles/spr_tile_door_locked", TileType.WallDoorLocked);
+            SetTileTexture("Tiles/spr_tile_door_unlocked", TileType.WallDoorUnlocked);
 
             var originX = (screenSize.X - GridWidth * TileSize) / 2;
             var originY = (screenSize.Y - GridHeight * TileSize) / 2;
@@ -65,10 +65,10 @@ namespace Roguelike
 
             for (int x = 0; x < _grid.GetLength(0); ++x)
                 for (int y = 0; y < _grid.GetLength(1); ++y)
-                    _grid[x, y] = new Tile(x, y);
+                    _grid[x, y] = new Tile(new Point(x, y));
         }
 
-        private void AddTile(string assetName, TileType tileType)
+        private void SetTileTexture(string assetName, TileType tileType)
         {
             _tileTextures[(int)tileType] = _content.Load<Texture2D>(assetName);
         }
@@ -129,34 +129,52 @@ namespace Roguelike
                 torch.Draw(spriteBatch, gameTime);
         }
 
-        public Tile GetTile(Vector2 position)
+        public Tile GetTile(Vector2 index)
         {
-            position -= Origin.ToVector2();
-            var x = (int)position.X / TileSize;
-            var y = (int)position.Y / TileSize;
+            index -= Origin.ToVector2();
+            var x = (int)index.X / TileSize;
+            var y = (int)index.Y / TileSize;
             return _grid[x, y];
         }
 
-        public bool IsSolid(int x, int y)
+        public void SetTile(Point index, TileType tileType)
         {
-            if (!TileIsValid(x, y))
+            if (!TileIsValid(index))
+                return;
+
+            var tile = _grid[index.X, index.Y];
+            tile.Type = tileType;
+            tile.Sprite.SetTexture(_tileTextures[(int)tileType]);
+        }
+
+        public bool IsSolid(Point tileIndex)
+        {
+            if (!TileIsValid(tileIndex))
                 return false;
 
-            var tileType = _grid[x, y].Type;
+            var tileType = _grid[tileIndex.X, tileIndex.Y].Type;
             return tileType != TileType.Floor &&
                 tileType != TileType.FloorAlt &&
                 tileType != TileType.WallDoorUnlocked;
         }
 
-        public bool TileIsValid(int x, int y)
+        public bool TileIsValid(Point tileIndex)
         {
-            if (x < 0 || x >= GridWidth)
+            if (tileIndex.X < 0 || tileIndex.X >= GridWidth)
                 return false;
 
-            if (y < 0 || y >= GridHeight)
+            if (tileIndex.Y < 0 || tileIndex.Y >= GridHeight)
                 return false;
 
             return true;
+        }
+
+        public void UnlockDoor()
+        {
+            if (!_doorTileIndices.HasValue)
+                return;
+
+            SetTile(_doorTileIndices.Value, TileType.WallDoorUnlocked);
         }
     }
 }

@@ -156,7 +156,7 @@ namespace Roguelike.Objects
                 level.GetTile(newPosition + new Vector2(+14.0f, +14.0f))
             };
 
-            return overlappingTiles.Any(tile => level.IsSolid(tile.ColumnIndex, tile.RowIndex));
+            return overlappingTiles.Any(tile => level.IsSolid(tile.Index));
         }
 
         public void TakeDamage(int damage)

@@ -52,6 +52,7 @@
     <Compile Include="Objects\Items\Heart.cs" />
     <Compile Include="Objects\Items\Item.cs" />
     <Compile Include="Objects\Items\ItemType.cs" />
+    <Compile Include="Objects\Items\Key.cs" />
     <Compile Include="Objects\Items\Potion.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="Objects\AnimationState.cs" />
