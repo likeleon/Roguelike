@@ -91,6 +91,10 @@ namespace Roguelike
             _aimSprite.Scale = new Vector2(2.0f);
 
             PopulateLevel();
+
+            _level.SetTileTexture("Tiles/spr_tile_floor_alt", TileType.FloorAlt);
+
+            SpawnRandomTiles(TileType.FloorAlt, count: 15);
         }
 
         private void LoadUI()
@@ -222,6 +226,22 @@ namespace Roguelike
                     var enemyType = (EnemyType)RandomGenerator.Next(EnumExtensions.GetEnumLength<EnemyType>());
                     SpawnEnemy(enemyType);
                 }
+            });
+        }
+
+        private void SpawnRandomTiles(TileType tileType, int count)
+        {
+            count.Times(() =>
+            {
+                var tileIndex = Point.Zero;
+                while (!_level.IsFloor(tileIndex))
+                {
+                    tileIndex = new Point(
+                        RandomGenerator.Next(Level.GridWidth), 
+                        RandomGenerator.Next(Level.GridHeight));
+                }
+
+                _level.SetTile(tileIndex, tileType);
             });
         }
 

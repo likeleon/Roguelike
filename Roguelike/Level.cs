@@ -12,8 +12,8 @@ namespace Roguelike
 {
     public sealed class Level
     {
-        private static int GridWidth = 19;
-        private static int GridHeight = 19;
+        public static int GridWidth = 19;
+        public static int GridHeight = 19;
 
         private readonly ContentManager _content;
         private readonly Texture2D[] _tileTextures = new Texture2D[EnumExtensions.GetEnumLength<TileType>()];
@@ -68,7 +68,7 @@ namespace Roguelike
                     _grid[x, y] = new Tile(new Point(x, y));
         }
 
-        private void SetTileTexture(string assetName, TileType tileType)
+        public void SetTileTexture(string assetName, TileType tileType)
         {
             _tileTextures[(int)tileType] = _content.Load<Texture2D>(assetName);
         }
