@@ -199,10 +199,7 @@ namespace Roguelike
         
         private void PopulateLevel()
         {
-            _items.Add(new Gold(Content)
-            {
-                Position = _virtualCenter.ToVector2() - new Vector2(50.0f, 0.0f)
-            });
+            SpawnItem(ItemType.Gold, _virtualCenter.ToVector2() - new Vector2(50.0f, 0.0f));
 
             _enemies.Add(new Humanoid(Content)
             {
@@ -267,6 +264,10 @@ namespace Roguelike
 
                 switch (item.ItemType)
                 {
+                    case ItemType.Gem:
+                        _scoreTotal += ((Gem)item).ScoreValue;
+                        break;
+
                     case ItemType.Gold:
                         _goldTotal += ((Gold)item).GoldValue;
                         break;
@@ -359,6 +360,10 @@ namespace Roguelike
             Item item = null;
             switch (itemType)
             {
+                case ItemType.Gem:
+                    item = new Gem(Content);
+                    break;
+
                 case ItemType.Gold:
                     item = new Gold(Content);
                     break;
