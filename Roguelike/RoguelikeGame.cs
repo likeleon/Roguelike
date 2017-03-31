@@ -143,7 +143,7 @@ namespace Roguelike
             {
                 Position = _virtualSize.ToVector2() - new Vector2(120.0f, 70.0f),
                 Origin = new Vector2(90.0f, 45.0f),
-                Color = new Color(255, 255, 255, 60)
+                Color = new Color(255, 255, 255) * 0.235f
             };
             _uiSprites.Add(_keyUiSprite);
 
