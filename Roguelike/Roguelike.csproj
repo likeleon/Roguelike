@@ -49,6 +49,7 @@
     <Compile Include="Objects\Enemies\Slime.cs" />
     <Compile Include="Objects\Items\Gem.cs" />
     <Compile Include="Objects\Items\Gold.cs" />
+    <Compile Include="Objects\Items\Heart.cs" />
     <Compile Include="Objects\Items\Item.cs" />
     <Compile Include="Objects\Items\ItemType.cs" />
     <Compile Include="Order.cs" />

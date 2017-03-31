@@ -271,6 +271,10 @@ namespace Roguelike
                     case ItemType.Gold:
                         _goldTotal += ((Gold)item).GoldValue;
                         break;
+
+                    case ItemType.Heart:
+                        _player.Health += ((Heart)item).Health;
+                        break;
                 }
                 _items.RemoveAt(i);
             }
@@ -366,6 +370,10 @@ namespace Roguelike
 
                 case ItemType.Gold:
                     item = new Gold(Content);
+                    break;
+
+                case ItemType.Heart:
+                    item = new Heart(Content);
                     break;
 
                 default:
