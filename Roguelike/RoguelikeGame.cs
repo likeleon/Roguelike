@@ -356,6 +356,34 @@ namespace Roguelike
                         _level.UnlockDoor();
                         _keyUiSprite.Color = Color.White;
                         break;
+
+                    case ItemType.Potion:
+                        {
+                            var potion = (Potion)item;
+                            switch (potion.PotionType)
+                            {
+                                case PotionType.Attack:
+                                    _player.Attack += potion.Attack;
+                                    break;
+
+                                case PotionType.Defense:
+                                    _player.Defense += potion.Defense;
+                                    break;
+
+                                case PotionType.Strength:
+                                    _player.Strength += potion.Strength;
+                                    break;
+
+                                case PotionType.Dexterity:
+                                    _player.Dexterity += potion.Dexterity;
+                                    break;
+
+                                case PotionType.Stamina:
+                                    _player.Stamina += potion.Stamina;
+                                    break;
+                            }
+                        }
+                        break;
                 }
                 _items.RemoveAt(i);
             }
