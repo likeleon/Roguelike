@@ -4,6 +4,6 @@ namespace Roguelike
 {
     public static class EnumExtensions
     {
-        public static int GetEnumLength<T>() => Enum.GetValues(typeof(T)).Length;
+        public static int GetCount<T>() => Enum.GetValues(typeof(T)).Length;
     }
 }

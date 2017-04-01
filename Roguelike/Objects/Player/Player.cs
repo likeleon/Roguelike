@@ -55,7 +55,7 @@ namespace Roguelike.Objects
 
         public Player(ContentManager content)
         {
-            Class = (PlayerClass)Rand.Next(EnumExtensions.GetEnumLength<PlayerClass>());
+            Class = (PlayerClass)Rand.Next(EnumExtensions.GetCount<PlayerClass>());
 
             var classStatValue = Rand.Next(0, 6);
             string className = string.Empty;
@@ -118,7 +118,7 @@ namespace Roguelike.Objects
 
         private void SetRandomTraits()
         {
-            if (PlayerTraitCount > EnumExtensions.GetEnumLength<PlayerTrait>())
+            if (PlayerTraitCount > EnumExtensions.GetCount<PlayerTrait>())
             {
                 var msg = $"{nameof(PlayerTraitCount)} should be greater or equal than number of {typeof(PlayerTrait)}";
                 throw new InvalidOperationException(msg);
@@ -129,7 +129,7 @@ namespace Roguelike.Objects
                 PlayerTrait trait;
                 do
                 {
-                    trait = (PlayerTrait)Rand.Next(EnumExtensions.GetEnumLength<PlayerTrait>());
+                    trait = (PlayerTrait)Rand.Next(EnumExtensions.GetCount<PlayerTrait>());
                 } while (_traits.Contains(trait));
 
                 var traitStatBuff = Rand.Next(5, 11);

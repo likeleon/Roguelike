@@ -26,7 +26,7 @@ namespace Roguelike
         private readonly GraphicsDeviceManager _graphics;
         private readonly Point _virtualSize = new Point(1920, 1080);
         private readonly Point _virtualCenter;
-        private readonly Texture2D[] _playerUiTextures = new Texture2D[EnumExtensions.GetEnumLength<PlayerClass>()];
+        private readonly Texture2D[] _playerUiTextures = new Texture2D[EnumExtensions.GetCount<PlayerClass>()];
         private readonly Texture2D[] _attackStatTextures = new Texture2D[2];
         private readonly Texture2D[] _defenseStatTextures = new Texture2D[2];
         private readonly Texture2D[] _strengthStatTextures = new Texture2D[2];
@@ -266,7 +266,7 @@ namespace Roguelike
             {
                 if (Rand.Next(2) == 1)
                 {
-                    var enemyType = (EnemyType)Rand.Next(EnumExtensions.GetEnumLength<EnemyType>());
+                    var enemyType = (EnemyType)Rand.Next(EnumExtensions.GetCount<EnemyType>());
                     SpawnEnemy(enemyType);
                 }
             });

@@ -40,7 +40,7 @@ namespace Roguelike.Objects
         public int Speed { get; set; }
 
         protected Vector2 Velocity { get; set; }
-        protected Texture2D[] Textures { get; } = new Texture2D[EnumExtensions.GetEnumLength<AnimationState>()];
+        protected Texture2D[] Textures { get; } = new Texture2D[EnumExtensions.GetCount<AnimationState>()];
 
         public override void Update(GameTime gameTime)
         {

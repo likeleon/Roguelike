@@ -16,7 +16,7 @@ namespace Roguelike.Objects
         public Potion(ContentManager content)
             : base(ItemType.Potion)
         {
-            PotionType = (PotionType)Rand.Next(EnumExtensions.GetEnumLength<ItemType>());
+            PotionType = (PotionType)Rand.Next(EnumExtensions.GetCount<ItemType>());
 
             var statValue = Rand.Next(5, 16);
             switch (PotionType)
