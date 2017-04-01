@@ -5,7 +5,7 @@ namespace Roguelike.Objects
 {
     public sealed class Gem : Item
     {
-        public int ScoreValue { get; } = 50;
+        public int ScoreValue { get; } = Rand.Next(101);
 
         public Gem(ContentManager content)
             : base(ItemType.Gem)

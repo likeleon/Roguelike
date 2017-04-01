@@ -5,7 +5,7 @@ namespace Roguelike.Objects
 {
     public sealed class Heart : Item
     {
-        public int Health { get; } = 15;
+        public int Health { get; } = Rand.Next(10, 21);
 
         public Heart(ContentManager content) 
             : base(ItemType.Heart)

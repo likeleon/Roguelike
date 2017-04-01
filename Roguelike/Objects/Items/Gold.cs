@@ -5,12 +5,14 @@ namespace Roguelike.Objects
 {
     public sealed class Gold : Item
     {
-        public int GoldValue { get; } = 15;
+        public int GoldValue { get; } = Rand.Next(5, 26);
 
         public Gold(ContentManager content)
             : base(ItemType.Gold)
         {
-            SetSprite(content.Load<Texture2D>("Loot/Gold/spr_pickup_gold_medium"), frames: 8, frameSpeed: 12);
+            var valueSize = (GoldValue < 9) ? "small" : (GoldValue >= 16) ? "large" : "medium";
+            var texture = content.Load<Texture2D>($"Loot/Gold/spr_pickup_gold_{valueSize}");
+            SetSprite(texture, frames: 8, frameSpeed: 12);
         }
     }
 }
