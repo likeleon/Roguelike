@@ -19,6 +19,11 @@ namespace Roguelike
         private readonly Point _virtualSize = new Point(1920, 1080);
         private readonly Point _virtualCenter;
         private readonly Texture2D[] _playerUiTextures = new Texture2D[EnumExtensions.GetEnumLength<PlayerClass>()];
+        private readonly Texture2D[] _attackStatTextures = new Texture2D[2];
+        private readonly Texture2D[] _defenseStatTextures = new Texture2D[2];
+        private readonly Texture2D[] _strengthStatTextures = new Texture2D[2];
+        private readonly Texture2D[] _dexterityStatTextures = new Texture2D[2];
+        private readonly Texture2D[] _staminaStatTextures = new Texture2D[2];
 
         private Camera _camera;
         private ViewportAdapter _viewportAdapter;
@@ -33,6 +38,11 @@ namespace Roguelike
         private Sprite _healthBarSprite;
         private Sprite _manaBarSprite;
         private Sprite _keyUiSprite;
+        private Sprite _attackStatSprite;
+        private Sprite _defenseStatSprite;
+        private Sprite _strengthStatSprite;
+        private Sprite _dexterityStatSprite;
+        private Sprite _staminaStatSprite;
 
         private int _scoreTotal;
         private int _goldTotal;
@@ -160,35 +170,55 @@ namespace Roguelike
             _uiSprites.Add(_keyUiSprite);
 
             // Stats
-            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_attack_ui"))
+            _attackStatSprite = LoadStatUI("attack", _attackStatTextures, new Vector2(_virtualCenter.X - 270.0f, _virtualSize.Y - 30.0f));
+            _defenseStatSprite = LoadStatUI("defense", _defenseStatTextures, new Vector2(_virtualCenter.X - 150.0f, _virtualSize.Y - 30.0f));
+            _strengthStatSprite = LoadStatUI("strength", _strengthStatTextures, new Vector2(_virtualCenter.X - 30.0f, _virtualSize.Y - 30.0f));
+            _dexterityStatSprite = LoadStatUI("dexterity", _dexterityStatTextures, new Vector2(_virtualCenter.X + 90.0f, _virtualSize.Y - 30.0f));
+            _staminaStatSprite = LoadStatUI("stamina", _staminaStatTextures, new Vector2(_virtualCenter.X + 210.0f, _virtualSize.Y - 30.0f));
+
+            foreach (var playerTrait in _player.Traits)
+            {
+                switch (playerTrait)
+                {
+                    case PlayerTrait.Attack:
+                        _attackStatSprite.SetTexture(_attackStatTextures[1]);
+                        _attackStatSprite.Scale = new Vector2(1.2f);
+                        break;
+
+                    case PlayerTrait.Defense:
+                        _defenseStatSprite.SetTexture(_defenseStatTextures[1]);
+                        _defenseStatSprite.Scale = new Vector2(1.2f);
+                        break;
+
+                    case PlayerTrait.Strength:
+                        _strengthStatSprite.SetTexture(_strengthStatTextures[1]);
+                        _strengthStatSprite.Scale = new Vector2(1.2f);
+                        break;
+
+                    case PlayerTrait.Dexterity:
+                        _dexterityStatSprite.SetTexture(_dexterityStatTextures[1]);
+                        _dexterityStatSprite.Scale = new Vector2(1.2f);
+                        break;
+
+                    case PlayerTrait.Stamina:
+                        _staminaStatSprite.SetTexture(_staminaStatTextures[1]);
+                        _staminaStatSprite.Scale = new Vector2(1.2f);
+                        break;
+                }
+            }
+        }
+
+        private Sprite LoadStatUI(string name, Texture2D[] statTextures, Vector2 spritePosition)
+        {
+            statTextures[0] = Content.Load<Texture2D>($"UI/spr_{name}_ui");
+            statTextures[1] = Content.Load<Texture2D>($"UI/spr_{name}_ui_alt");
+            var statSprite = new Sprite(statTextures[0])
             {
                 Origin = new Vector2(16.0f, 16.0f),
-                Position = new Vector2(_virtualCenter.X - 270.0f, _virtualSize.Y - 30.0f)
-            });
-
-            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_defense_ui"))
-            {
-                Origin = new Vector2(16.0f, 12.0f),
-                Position = new Vector2(_virtualCenter.X - 150.0f, _virtualSize.Y - 30.0f)
-            });
-
-            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_strength_ui"))
-            {
-                Origin = new Vector2(22.0f, 12.0f),
-                Position = new Vector2(_virtualCenter.X - 30.0f, _virtualSize.Y - 30.0f)
-            });
-
-            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_dexterity_ui"))
-            {
-                Origin = new Vector2(16.0f, 12.0f),
-                Position = new Vector2(_virtualCenter.X + 90.0f, _virtualSize.Y - 30.0f)
-            });
-
-            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_stamina_ui"))
-            {
-                Origin = new Vector2(16.0f, 16.0f),
-                Position = new Vector2(_virtualCenter.X + 210.0f, _virtualSize.Y - 30.0f)
-            });
+                Position = spritePosition
+            };
+            _uiSprites.Add(statSprite);
+            return statSprite;
         }
 
         private void ConstructLightGrid()

@@ -56,6 +56,7 @@
     <Compile Include="Objects\Items\Key.cs" />
     <Compile Include="Objects\Items\Potion.cs" />
     <Compile Include="Objects\Player\PlayerClass.cs" />
+    <Compile Include="Objects\Player\PlayerTrait.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="Objects\AnimationState.cs" />
     <Compile Include="Objects\Entity.cs" />

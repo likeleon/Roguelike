@@ -12,6 +12,7 @@ namespace Roguelike.Objects
     public sealed class Player : Entity
     {
         private static readonly int BaseStatPoints = 50;
+        private static readonly int PlayerTraitCount = 2;
 
         private static readonly IReadOnlyDictionary<AnimationState, string> AnimTextureAssets = new Dictionary<AnimationState, string>
         {
@@ -28,6 +29,8 @@ namespace Roguelike.Objects
         private static readonly TimeSpan AttackDelay = TimeSpan.FromMilliseconds(250);
         private static readonly TimeSpan TakeDamageDelay = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan ManaRegenDelay = TimeSpan.FromMilliseconds(200);
+
+        private readonly PlayerTrait[] _traits = new PlayerTrait[PlayerTraitCount];
 
         private TimeSpan _attackDelta;
         private bool _isAttacking;
@@ -48,6 +51,7 @@ namespace Roguelike.Objects
         }
 
         public PlayerClass Class { get; }
+        public IEnumerable<PlayerTrait> Traits => _traits;
 
         public Player(ContentManager content)
         {
@@ -91,6 +95,8 @@ namespace Roguelike.Objects
             CurrentAnimationState = AnimationState.WalkUp;
             Sprite.Origin = new Vector2(13.0f, 18.0f);
 
+            SetRandomTraits();
+
             Health = MaxHealth = 100;
             Mana = MaxMana = 50;
             Speed = 200;
@@ -108,6 +114,38 @@ namespace Roguelike.Objects
             Strength += BaseStatPoints * strengthBias / total;
             Dexterity += BaseStatPoints * dexterityBias / total;
             Stamina += BaseStatPoints * staminaBias / total;
+        }
+
+        private void SetRandomTraits()
+        {
+            PlayerTraitCount.Times(i =>
+            {
+                var trait = (PlayerTrait)RandomGenerator.Next(EnumExtensions.GetEnumLength<PlayerTrait>());
+                var traitStatBuff = RandomGenerator.Next(5, 11);
+                switch (trait)
+                {
+                    case PlayerTrait.Attack:
+                        Attack += traitStatBuff;
+                        break;
+
+                    case PlayerTrait.Defense:
+                        Defense += traitStatBuff;
+                        break;
+
+                    case PlayerTrait.Strength:
+                        Strength += traitStatBuff;
+                        break;
+
+                    case PlayerTrait.Dexterity:
+                        Dexterity += traitStatBuff;
+                        break;
+
+                    case PlayerTrait.Stamina:
+                        Stamina += traitStatBuff;
+                        break;
+                }
+                _traits[i] = trait;
+            });
         }
 
         public void Update(GameTime gameTime, Level level, Camera camera)
