@@ -182,12 +182,12 @@ namespace Roguelike
             var tileIndex = Point.Zero;
             while (!IsFloor(tileIndex))
             {
-                tileIndex = new Point(RandomGenerator.Next(GridWidth), RandomGenerator.Next(GridHeight));
+                tileIndex = new Point(Rand.Next(GridWidth), Rand.Next(GridHeight));
             }
 
             var tileLocation = GetActualTileLocation(tileIndex);
-            tileLocation.X += RandomGenerator.Next(-10, 11);
-            tileLocation.Y += RandomGenerator.Next(-10, 11);
+            tileLocation.X += Rand.Next(-10, 11);
+            tileLocation.Y += Rand.Next(-10, 11);
 
             return tileLocation;
         }

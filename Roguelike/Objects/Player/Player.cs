@@ -55,9 +55,9 @@ namespace Roguelike.Objects
 
         public Player(ContentManager content)
         {
-            Class = (PlayerClass)RandomGenerator.Next(EnumExtensions.GetEnumLength<PlayerClass>());
+            Class = (PlayerClass)Rand.Next(EnumExtensions.GetEnumLength<PlayerClass>());
 
-            var classStatValue = RandomGenerator.Next(0, 6);
+            var classStatValue = Rand.Next(0, 6);
             string className = string.Empty;
             switch (Class)
             {
@@ -101,11 +101,11 @@ namespace Roguelike.Objects
             Mana = MaxMana = 50;
             Speed = 200;
 
-            var attackBias = RandomGenerator.Next(101);
-            var defenseBias = RandomGenerator.Next(101);
-            var strengthBias = RandomGenerator.Next(101);
-            var dexterityBias = RandomGenerator.Next(101);
-            var staminaBias = RandomGenerator.Next(101);
+            var attackBias = Rand.Next(101);
+            var defenseBias = Rand.Next(101);
+            var strengthBias = Rand.Next(101);
+            var dexterityBias = Rand.Next(101);
+            var staminaBias = Rand.Next(101);
 
             var total = attackBias + defenseBias + strengthBias + dexterityBias + staminaBias;
 
@@ -129,10 +129,10 @@ namespace Roguelike.Objects
                 PlayerTrait trait;
                 do
                 {
-                    trait = (PlayerTrait)RandomGenerator.Next(EnumExtensions.GetEnumLength<PlayerTrait>());
+                    trait = (PlayerTrait)Rand.Next(EnumExtensions.GetEnumLength<PlayerTrait>());
                 } while (_traits.Contains(trait));
 
-                var traitStatBuff = RandomGenerator.Next(5, 11);
+                var traitStatBuff = Rand.Next(5, 11);
                 switch (trait)
                 {
                     case PlayerTrait.Attack:

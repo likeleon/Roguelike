@@ -73,7 +73,7 @@
     <Compile Include="ViewportAdapters\ViewportAdapter.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Objects\Object.cs" />
-    <Compile Include="RandomGenerator.cs" />
+    <Compile Include="Rand.cs" />
     <Compile Include="RoguelikeGame.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

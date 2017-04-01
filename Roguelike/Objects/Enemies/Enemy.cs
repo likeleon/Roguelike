@@ -4,14 +4,14 @@
     {
         public Enemy()
         {
-            Health = RandomGenerator.Next(40, 121);
-            Attack = RandomGenerator.Next(4, 11);
-            Defense = RandomGenerator.Next(4, 11);
-            Strength = RandomGenerator.Next(4, 11);
-            Dexterity = RandomGenerator.Next(4, 11);
-            Stamina = RandomGenerator.Next(4, 11);
+            Health = Rand.Next(40, 121);
+            Attack = Rand.Next(4, 11);
+            Defense = Rand.Next(4, 11);
+            Strength = Rand.Next(4, 11);
+            Dexterity = Rand.Next(4, 11);
+            Stamina = Rand.Next(4, 11);
 
-            Speed = RandomGenerator.Next(50, 201);
+            Speed = Rand.Next(50, 201);
         }
 
         public void TakeDamage(int damage)

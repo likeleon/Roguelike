@@ -255,18 +255,18 @@ namespace Roguelike
         {
             MaxItemSpawnCount.Times(() =>
             {
-                if (RandomGenerator.Next(2) == 1)
+                if (Rand.Next(2) == 1)
                 {
-                    var itemType = (ItemType)RandomGenerator.Next(2);
+                    var itemType = (ItemType)Rand.Next(2);
                     SpawnItem(itemType);
                 }
             });
 
             MaxEnemySpawnCount.Times(() =>
             {
-                if (RandomGenerator.Next(2) == 1)
+                if (Rand.Next(2) == 1)
                 {
-                    var enemyType = (EnemyType)RandomGenerator.Next(EnumExtensions.GetEnumLength<EnemyType>());
+                    var enemyType = (EnemyType)Rand.Next(EnumExtensions.GetEnumLength<EnemyType>());
                     SpawnEnemy(enemyType);
                 }
             });
@@ -280,8 +280,8 @@ namespace Roguelike
                 while (!_level.IsFloor(tileIndex))
                 {
                     tileIndex = new Point(
-                        RandomGenerator.Next(Level.GridWidth), 
-                        RandomGenerator.Next(Level.GridHeight));
+                        Rand.Next(Level.GridWidth), 
+                        Rand.Next(Level.GridHeight));
                 }
 
                 _level.SetTile(tileIndex, tileType);
@@ -415,22 +415,22 @@ namespace Roguelike
                     var position = enemy.Position;
                     for (int j = 0; j < 5; ++j)
                     {
-                        position.X += RandomGenerator.Next(-15, 16);
-                        position.Y += RandomGenerator.Next(-15, 16);
-                        var itemType = RandomGenerator.Next(0, 2) == 0 ? ItemType.Gold : ItemType.Gem;
+                        position.X += Rand.Next(-15, 16);
+                        position.Y += Rand.Next(-15, 16);
+                        var itemType = Rand.Next(0, 2) == 0 ? ItemType.Gold : ItemType.Gem;
                         SpawnItem(itemType, position);
                     }
 
-                    if (RandomGenerator.Next(5) == 0)
+                    if (Rand.Next(5) == 0)
                     {
-                        position.X += RandomGenerator.Next(-15, 16);
-                        position.Y += RandomGenerator.Next(-15, 16);
+                        position.X += Rand.Next(-15, 16);
+                        position.Y += Rand.Next(-15, 16);
                         SpawnItem(ItemType.Heart, position);
                     }
-                    else if (RandomGenerator.Next(5) == 1)
+                    else if (Rand.Next(5) == 1)
                     {
-                        position.X += RandomGenerator.Next(-15, 16);
-                        position.Y += RandomGenerator.Next(-15, 16);
+                        position.X += Rand.Next(-15, 16);
+                        position.Y += Rand.Next(-15, 16);
                         SpawnItem(ItemType.Potion, position);
                     }
 

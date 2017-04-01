@@ -4,7 +4,7 @@ using System;
 
 namespace Roguelike
 {
-    public static class RandomGenerator
+    public static class Rand
     {
 #if FIXED_SEED
         private static readonly int _seed = 0;
