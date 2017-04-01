@@ -55,10 +55,11 @@
     <Compile Include="Objects\Items\ItemType.cs" />
     <Compile Include="Objects\Items\Key.cs" />
     <Compile Include="Objects\Items\Potion.cs" />
+    <Compile Include="Objects\Player\PlayerClass.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="Objects\AnimationState.cs" />
     <Compile Include="Objects\Entity.cs" />
-    <Compile Include="Objects\Player.cs" />
+    <Compile Include="Objects\Player\Player.cs" />
     <Compile Include="Objects\Projectile.cs" />
     <Compile Include="Utils\EnumExtensions.cs" />
     <Compile Include="Utils\EnumerableExtensions.cs" />

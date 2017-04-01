@@ -18,6 +18,7 @@ namespace Roguelike
         private readonly GraphicsDeviceManager _graphics;
         private readonly Point _virtualSize = new Point(1920, 1080);
         private readonly Point _virtualCenter;
+        private readonly Texture2D[] _playerUiTextures = new Texture2D[EnumExtensions.GetEnumLength<PlayerClass>()];
 
         private Camera _camera;
         private ViewportAdapter _viewportAdapter;
@@ -71,36 +72,39 @@ namespace Roguelike
 
         protected override void LoadContent()
         {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-
             _font = Content.Load<SpriteFont>("Fonts/ADDSBP__");
-            _projectileTexture = Content.Load<Texture2D>("Projectiles/spr_sword");
-
-            LoadUI();
-
-            _level = new Level(Content, _virtualSize);
-            _level.LoadFromFile("Content/Data/level_data.txt");
-
-            ConstructLightGrid();
 
             _player = new Player(Content);
             _player.Position = _virtualCenter.ToVector2() + new Vector2(197.0f, 410.0f);
 
+            _level = new Level(Content, _virtualSize);
+            _level.LoadFromFile("Content/Data/level_data.txt");
+            PopulateLevel();
+            _level.SetTileTexture("Tiles/spr_tile_floor_alt", TileType.FloorAlt);
+            SpawnRandomTiles(TileType.FloorAlt, count: 15);
+
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            _projectileTexture = Content.Load<Texture2D>("Projectiles/spr_sword");
+
+            ConstructLightGrid();
+
+            LoadUI();
+
             _aimSprite = new Sprite(Content.Load<Texture2D>("UI/spr_aim"));
             _aimSprite.Origin = new Vector2(16.5f, 16.5f);
             _aimSprite.Scale = new Vector2(2.0f);
-
-            PopulateLevel();
-
-            _level.SetTileTexture("Tiles/spr_tile_floor_alt", TileType.FloorAlt);
-
-            SpawnRandomTiles(TileType.FloorAlt, count: 15);
         }
 
         private void LoadUI()
         {
+            _playerUiTextures[(int)PlayerClass.Warrior] = Content.Load<Texture2D>("UI/spr_warrior_ui");
+            _playerUiTextures[(int)PlayerClass.Mage] = Content.Load<Texture2D>("UI/spr_mage_ui");
+            _playerUiTextures[(int)PlayerClass.Archer] = Content.Load<Texture2D>("UI/spr_archer_ui");
+            _playerUiTextures[(int)PlayerClass.Thief] = Content.Load<Texture2D>("UI/spr_thief_ui");
+
             // Player
-            _uiSprites.Add(new Sprite(Content.Load<Texture2D>("UI/spr_warrior_ui"))
+            _uiSprites.Add(new Sprite(_playerUiTextures[(int)_player.Class])
             {
                 Position = new Vector2(45.0f, 45.0f),
                 Origin = new Vector2(30.0f, 30.0f)

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Roguelike.Graphics;
+using Roguelike.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,16 +11,18 @@ namespace Roguelike.Objects
 {
     public sealed class Player : Entity
     {
+        private static readonly int BaseStatPoints = 50;
+
         private static readonly IReadOnlyDictionary<AnimationState, string> AnimTextureAssets = new Dictionary<AnimationState, string>
         {
-            [AnimationState.WalkUp] = "spr_warrior_walk_up",
-            [AnimationState.WalkDown] = "spr_warrior_walk_down",
-            [AnimationState.WalkRight] = "spr_warrior_walk_right",
-            [AnimationState.WalkLeft] = "spr_warrior_walk_left",
-            [AnimationState.IdleUp] = "spr_warrior_idle_up",
-            [AnimationState.IdleDown] = "spr_warrior_idle_down",
-            [AnimationState.IdleRight] = "spr_warrior_idle_right",
-            [AnimationState.IdleLeft] = "spr_warrior_idle_left"
+            [AnimationState.WalkUp] = "spr_{0}_walk_up",
+            [AnimationState.WalkDown] = "spr_{0}_walk_down",
+            [AnimationState.WalkRight] = "spr_{0}_walk_right",
+            [AnimationState.WalkLeft] = "spr_{0}_walk_left",
+            [AnimationState.IdleUp] = "spr_{0}_idle_up",
+            [AnimationState.IdleDown] = "spr_{0}_idle_down",
+            [AnimationState.IdleRight] = "spr_{0}_idle_right",
+            [AnimationState.IdleLeft] = "spr_{0}_idle_left"
         };
 
         private static readonly TimeSpan AttackDelay = TimeSpan.FromMilliseconds(250);
@@ -44,10 +47,45 @@ namespace Roguelike.Objects
             set { _canTakeDamage = value; _takeDamageDelta = default(TimeSpan); }
         }
 
+        public PlayerClass Class { get; }
+
         public Player(ContentManager content)
         {
+            Class = (PlayerClass)RandomGenerator.Next(EnumExtensions.GetEnumLength<PlayerClass>());
+
+            var classStatValue = RandomGenerator.Next(0, 6);
+            string className = string.Empty;
+            switch (Class)
+            {
+                case PlayerClass.Warrior:
+                    Strength = classStatValue;
+                    className = "Warrior";
+                    break;
+
+                case PlayerClass.Mage:
+                    Defense = classStatValue;
+                    className = "Mage";
+                    break;
+
+                case PlayerClass.Archer:
+                    Dexterity = classStatValue;
+                    className = "Archer";
+                    break;
+
+                case PlayerClass.Thief:
+                    Stamina = classStatValue;
+                    className = "Thief";
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"Unknown player class '{Class}");
+            }
+
             foreach (var kvp in AnimTextureAssets)
-                Textures[(int)kvp.Key] = content.Load<Texture2D>($"Players/Warrior/{kvp.Value}");
+            {
+                var assetName = kvp.Value.F(className.ToLower());
+                Textures[(int)kvp.Key] = content.Load<Texture2D>($"Players/{className}/{assetName}");
+            }
 
             SetSprite(Textures[(int)AnimationState.WalkUp], frames: 8, frameSpeed: 12);
             CurrentAnimationState = AnimationState.WalkUp;
@@ -57,11 +95,19 @@ namespace Roguelike.Objects
             Mana = MaxMana = 50;
             Speed = 200;
 
-            Attack = 10;
-            Defense = 10;
-            Strength = 10;
-            Dexterity = 10;
-            Stamina = 10;
+            var attackBias = RandomGenerator.Next(101);
+            var defenseBias = RandomGenerator.Next(101);
+            var strengthBias = RandomGenerator.Next(101);
+            var dexterityBias = RandomGenerator.Next(101);
+            var staminaBias = RandomGenerator.Next(101);
+
+            var total = attackBias + defenseBias + strengthBias + dexterityBias + staminaBias;
+
+            Attack += BaseStatPoints * attackBias / total;
+            Defense += BaseStatPoints * defenseBias / total;
+            Strength += BaseStatPoints * strengthBias / total;
+            Dexterity += BaseStatPoints * dexterityBias / total;
+            Stamina += BaseStatPoints * staminaBias / total;
         }
 
         public void Update(GameTime gameTime, Level level, Camera camera)
