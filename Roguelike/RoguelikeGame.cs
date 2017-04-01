@@ -15,6 +15,14 @@ namespace Roguelike
         private static readonly int MaxItemSpawnCount = 50;
         private static readonly int MaxEnemySpawnCount = 20;
 
+        private static readonly IReadOnlyDictionary<PlayerClass, string> ProjectileNamesByClass = new Dictionary<PlayerClass, string>()
+        {
+            [PlayerClass.Archer] = "arrow",
+            [PlayerClass.Mage] = "magic_ball",
+            [PlayerClass.Thief] = "dagger",
+            [PlayerClass.Warrior] = "sword",
+        };
+
         private readonly GraphicsDeviceManager _graphics;
         private readonly Point _virtualSize = new Point(1920, 1080);
         private readonly Point _virtualCenter;
@@ -95,7 +103,8 @@ namespace Roguelike
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            _projectileTexture = Content.Load<Texture2D>("Projectiles/spr_sword");
+            var projectileName = ProjectileNamesByClass[_player.Class];
+            _projectileTexture = Content.Load<Texture2D>($"Projectiles/spr_{projectileName}");
 
             ConstructLightGrid();
 
