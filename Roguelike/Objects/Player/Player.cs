@@ -118,9 +118,20 @@ namespace Roguelike.Objects
 
         private void SetRandomTraits()
         {
+            if (PlayerTraitCount > EnumExtensions.GetEnumLength<PlayerTrait>())
+            {
+                var msg = $"{nameof(PlayerTraitCount)} should be greater or equal than number of {typeof(PlayerTrait)}";
+                throw new InvalidOperationException(msg);
+            }
+
             PlayerTraitCount.Times(i =>
             {
-                var trait = (PlayerTrait)RandomGenerator.Next(EnumExtensions.GetEnumLength<PlayerTrait>());
+                PlayerTrait trait;
+                do
+                {
+                    trait = (PlayerTrait)RandomGenerator.Next(EnumExtensions.GetEnumLength<PlayerTrait>());
+                } while (_traits.Contains(trait));
+
                 var traitStatBuff = RandomGenerator.Next(5, 11);
                 switch (trait)
                 {
