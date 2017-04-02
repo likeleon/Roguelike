@@ -36,7 +36,6 @@ namespace Roguelike
         private Camera _camera;
         private ViewportAdapter _viewportAdapter;
 
-        private SpriteBatch _spriteBatch;
         private SpriteFont _font;
         private Texture2D _projectileTexture;
 
@@ -63,11 +62,9 @@ namespace Roguelike
 
         public RoguelikeGame()
         {
-            Global.Content = Content;
-
-            _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
+            _graphics = new GraphicsDeviceManager(this);
             _graphics.PreferredBackBufferWidth = 1280;
             _graphics.PreferredBackBufferHeight = 800;
             _graphics.SynchronizeWithVerticalRetrace = true;
@@ -87,6 +84,10 @@ namespace Roguelike
             _camera = new Camera(_viewportAdapter);
             _camera.Zoom = 2.0f;
 
+            Global.Content = Content;
+            Global.GraphicsDevice = GraphicsDevice;
+            Global.SpriteBatch = new SpriteBatch(GraphicsDevice);
+
             base.Initialize();
         }
 
@@ -102,8 +103,6 @@ namespace Roguelike
             PopulateLevel();
             _level.SetTileTexture("Tiles/spr_tile_floor_alt", TileType.FloorAlt);
             SpawnRandomTiles(TileType.FloorAlt, count: 15);
-
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             var projectileName = ProjectileNamesByClass[_player.Class];
             _projectileTexture = Content.Load<Texture2D>($"Projectiles/spr_{projectileName}");
@@ -540,29 +539,31 @@ namespace Roguelike
         {
             GraphicsDevice.Clear(new Color(3, 3, 3, 225));
 
-            _spriteBatch.Begin(transformMatrix: _camera.GetViewMatrix());
+            var spriteBatch = Global.SpriteBatch;
 
-            _level.Draw(_spriteBatch, gameTime);
+            spriteBatch.Begin(transformMatrix: _camera.GetViewMatrix());
+
+            _level.Draw(spriteBatch, gameTime);
 
             foreach (var item in _items)
-                item.Draw(_spriteBatch, gameTime);
+                item.Draw(spriteBatch, gameTime);
 
             foreach (var enemy in _enemies)
-                enemy.Draw(_spriteBatch, gameTime);
+                enemy.Draw(spriteBatch, gameTime);
 
             foreach (var projectile in _playerProjectiles)
-                projectile.Draw(_spriteBatch, gameTime);
+                projectile.Draw(spriteBatch, gameTime);
 
-            _player.Draw(_spriteBatch, gameTime);
+            _player.Draw(spriteBatch, gameTime);
 
             foreach (var sprite in _lightGrid)
-                sprite.Draw(_spriteBatch);
+                sprite.Draw(spriteBatch);
 
-            _spriteBatch.End();
+            spriteBatch.End();
 
-            _spriteBatch.Begin(transformMatrix: _viewportAdapter.GetScaleMatrix());
+            spriteBatch.Begin(transformMatrix: _viewportAdapter.GetScaleMatrix());
 
-            _aimSprite.Draw(_spriteBatch);
+            _aimSprite.Draw(spriteBatch);
 
             DrawString(_player.Attack.ToString(), new Vector2(_virtualCenter.X - 210.0f, _virtualSize.Y - 25.0f), 1.5f);
             DrawString(_player.Defense.ToString(), new Vector2(_virtualCenter.X - 90.0f, _virtualSize.Y - 25.0f), 1.5f);
@@ -574,18 +575,18 @@ namespace Roguelike
             DrawString(_goldTotal.ToString().PadLeft(6, '0'), new Vector2(_virtualCenter.X + 220.0f, 50.0f), 2.0f);
 
             foreach (var sprite in _uiSprites)
-                sprite.Draw(_spriteBatch);
+                sprite.Draw(spriteBatch);
 
             DrawString($"Floor {_level.FloorNumber}", new Vector2(70.0f, _virtualSize.Y - 60.0f), 1.5f);
             DrawString($"Room {_level.RoomNumber}", new Vector2(70.0f, _virtualSize.Y - 25.0f), 1.5f);
 
             _healthBarSprite.TextureRect = new Rectangle(0, 0, (int)(213.0f / _player.MaxHealth * _player.Health), 8);
-            _healthBarSprite.Draw(_spriteBatch);
+            _healthBarSprite.Draw(spriteBatch);
 
             _manaBarSprite.TextureRect = new Rectangle(0, 0, (int)(213.0f / _player.MaxMana * _player.Mana), 8);
-            _manaBarSprite.Draw(_spriteBatch);
+            _manaBarSprite.Draw(spriteBatch);
 
-            _spriteBatch.End();
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
@@ -593,7 +594,7 @@ namespace Roguelike
         private void DrawString(string text, Vector2 position, float scale)
         {
             var textSize = _font.MeasureString(text);
-            _spriteBatch.DrawString(_font, text, position, Color.White, 
+            Global.SpriteBatch.DrawString(_font, text, position, Color.White, 
                 rotation: 0.0f, 
                 origin: textSize / 2.0f, 
                 scale: scale, 
