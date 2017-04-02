@@ -63,6 +63,8 @@ namespace Roguelike
 
         public RoguelikeGame()
         {
+            Global.Content = Content;
+
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
@@ -507,11 +509,11 @@ namespace Roguelike
             switch (enemyType)
             {
                 case EnemyType.Slime:
-                    enemy = new Slime(Content);
+                    enemy = new Slime();
                     break;
 
                 case EnemyType.Humanoid:
-                    enemy = new Humanoid(Content);
+                    enemy = new Humanoid();
                     break;
 
                 default:
