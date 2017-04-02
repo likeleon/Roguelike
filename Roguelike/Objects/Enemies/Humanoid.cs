@@ -7,39 +7,63 @@ namespace Roguelike.Objects
 {
     public sealed class Humanoid : Enemy
     {
+        private static readonly IReadOnlyDictionary<ArmorTier, Color> ArmorTierColors = new Dictionary<ArmorTier, Color>
+        {
+            [ArmorTier.Bronze] = new Color(110, 55, 28),
+            [ArmorTier.Silver] = new Color(209, 208, 201),
+            [ArmorTier.Gold] = new Color(229, 192, 21),
+        };
+
         public HumanoidType HumanoidType { get; } = (HumanoidType)Rand.Next(EnumExtensions.GetCount<HumanoidType>());
 
-        [Flags]
-        public enum ArmorFlags
+        public enum ArmorType
         {
-            None = 0,
-            Helmet = 1,
-            Torso = 2,
-            Legs = 4
+            Helmet,
+            Torso,
+            Legs
+        }
+
+        public enum ArmorTier
+        {
+            Bronze,
+            Silver,
+            Gold
         }
 
         public Humanoid()
         {
-            var armors = ArmorFlags.None;
-            if (Rand.Next(5) == 0)
-                armors |= ArmorFlags.Helmet;
-            if (Rand.Next(5) == 0)
-                armors |= ArmorFlags.Torso;
-            if (Rand.Next(5) == 0)
-                armors |= ArmorFlags.Legs;
+            var armorOptions = new Dictionary<ArmorType, ArmorTier>();
 
-            var textures = CreateTextures(armors);
+            if (Rand.Next(5) == 0)
+                armorOptions.Add(ArmorType.Helmet, RandomSelectArmorTier());
+            if (Rand.Next(5) == 0)
+                armorOptions.Add(ArmorType.Torso, RandomSelectArmorTier());
+            if (Rand.Next(5) == 0)
+                armorOptions.Add(ArmorType.Legs, RandomSelectArmorTier());
+
+            var textures = CreateTextures(armorOptions);
             foreach (var kvp in textures)
                 Textures[(int)kvp.Key] = kvp.Value;
 
             SetSprite(Textures[(int)(AnimationState.WalkUp)], frames: 8, frameSpeed: 12);
         }
 
-        private AnimationTextureMap CreateTextures(ArmorFlags armors)
+        private static ArmorTier RandomSelectArmorTier()
+        {
+            var tierValue = Rand.Next(0, 100);
+            if (tierValue < 50)
+                return ArmorTier.Bronze;
+            else if (tierValue < 85)
+                return ArmorTier.Silver;
+            else
+                return ArmorTier.Gold;
+        }
+
+        private AnimationTextureMap CreateTextures(IReadOnlyDictionary<ArmorType, ArmorTier> armorOptions)
         {
             var baseTextures = EnemyTextureFactory.GetBaseTextures(HumanoidType.ToString());
 
-            if (armors == ArmorFlags.None)
+            if (armorOptions.Count <= 0)
                 return baseTextures;
 
             var finalTextures = new AnimationTextureMap();
@@ -48,8 +72,8 @@ namespace Roguelike.Objects
                 var baseTexture = baseTextures[animationState];
                 var renderTarget = new RenderTarget2D(Global.GraphicsDevice, baseTexture.Width, baseTexture.Height);
 
-                var textures = GetTexturesToCompose(animationState, armors);
-                DrawTexturesToRenderTarget(textures, renderTarget);
+                var armorTextures = GetArmorTextures(animationState, armorOptions);
+                DrawTexturesToRenderTarget(baseTexture, armorTextures, renderTarget);
 
                 finalTextures.Add(animationState, renderTarget);
             }
@@ -57,22 +81,39 @@ namespace Roguelike.Objects
             return finalTextures;
         }
 
-        private IEnumerable<Texture2D> GetTexturesToCompose(AnimationState animationState, ArmorFlags armors)
+        private IEnumerable<Tuple<Texture2D, ArmorTier>> GetArmorTextures(
+            AnimationState animationState, 
+            IReadOnlyDictionary<ArmorType, ArmorTier> armorOptions)
         {
-            var baseTextures = EnemyTextureFactory.GetBaseTextures(HumanoidType.ToString());
-            yield return baseTextures[animationState];
+            foreach (var armorOption in armorOptions)
+            {
+                var armorType = armorOption.Key;
+                var armorTier = armorOption.Value;
 
-            if (armors.HasFlag(ArmorFlags.Helmet))
-                yield return EnemyTextureFactory.GetHelmetTextures()[animationState];
-
-            if (armors.HasFlag(ArmorFlags.Torso))
-                yield return EnemyTextureFactory.GetTorsoTextures()[animationState];
-
-            if (armors.HasFlag(ArmorFlags.Legs))
-                yield return EnemyTextureFactory.GetLegsTextures()[animationState];
+                var texture = GetArmorAnimationTextureMap(armorType)[animationState];
+                yield return Tuple.Create(texture, armorTier);
+            }
         }
 
-        private static void DrawTexturesToRenderTarget(IEnumerable<Texture2D> textures, RenderTarget2D renderTarget)
+        private static AnimationTextureMap GetArmorAnimationTextureMap(ArmorType armorType)
+        {
+            switch (armorType)
+            {
+                case ArmorType.Helmet:
+                    return EnemyTextureFactory.GetHelmetTextures();
+                case ArmorType.Torso:
+                    return EnemyTextureFactory.GetTorsoTextures();
+                case ArmorType.Legs:
+                    return EnemyTextureFactory.GetLegsTextures();
+                default:
+                    throw new InvalidOperationException($"Invalid {nameof(ArmorType)} '{armorType}'");
+            }
+        }
+
+        private static void DrawTexturesToRenderTarget(
+            Texture2D baseTexture,
+            IEnumerable<Tuple<Texture2D, ArmorTier>> armorTexturesWithTier, 
+            RenderTarget2D renderTarget)
         {
             var graphicsDevice = Global.GraphicsDevice;
             var spriteBatch = Global.SpriteBatch;
@@ -82,8 +123,13 @@ namespace Roguelike.Objects
 
             spriteBatch.Begin();
 
-            foreach (var texture in textures)
-                spriteBatch.Draw(texture, Vector2.Zero, Color.White);
+            spriteBatch.Draw(baseTexture, Vector2.Zero, Color.White);
+            foreach (var kvp in armorTexturesWithTier)
+            {
+                var armorTexture = kvp.Item1;
+                var armorTier = kvp.Item2;
+                spriteBatch.Draw(armorTexture, Vector2.Zero, ArmorTierColors[armorTier]);
+            }
 
             spriteBatch.End();
 

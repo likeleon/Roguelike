@@ -67,6 +67,7 @@
     <Compile Include="Utils\Cache.cs" />
     <Compile Include="Utils\EnumExtensions.cs" />
     <Compile Include="Utils\EnumerableExtensions.cs" />
+    <Compile Include="Utils\IDictionaryExtensions.cs" />
     <Compile Include="Utils\StringExtensions.cs" />
     <Compile Include="ViewportAdapters\BoxingViewportAdapter.cs" />
     <Compile Include="ViewportAdapters\DefaultViewportAdapter.cs" />
