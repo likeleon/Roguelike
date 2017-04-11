@@ -1634,3 +1634,39 @@
 /processorParam:TextureFormat=Color
 /build:Armor/Torso/spr_torso_walk_front.png
 
+#begin Sounds/snd_coin_pickup.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/snd_coin_pickup.wav
+
+#begin Sounds/snd_enemy_dead.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/snd_enemy_dead.wav
+
+#begin Sounds/snd_fire.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/snd_fire.wav
+
+#begin Sounds/snd_gem_pickup.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/snd_gem_pickup.wav
+
+#begin Sounds/snd_key_pickup.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/snd_key_pickup.wav
+
+#begin Sounds/snd_player_hit.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/snd_player_hit.wav
+

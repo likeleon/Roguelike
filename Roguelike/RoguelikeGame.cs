@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Roguelike.Graphics;
@@ -32,6 +33,11 @@ namespace Roguelike
         private readonly Texture2D[] _strengthStatTextures = new Texture2D[2];
         private readonly Texture2D[] _dexterityStatTextures = new Texture2D[2];
         private readonly Texture2D[] _staminaStatTextures = new Texture2D[2];
+        private readonly List<Sprite> _uiSprites = new List<Sprite>();
+        private readonly List<Sprite> _lightGrid = new List<Sprite>();
+        private readonly List<Projectile> _playerProjectiles = new List<Projectile>();
+        private readonly List<Item> _items = new List<Item>();
+        private readonly List<Enemy> _enemies = new List<Enemy>();
 
         private Camera _camera;
         private ViewportAdapter _viewportAdapter;
@@ -54,11 +60,10 @@ namespace Roguelike
         private int _scoreTotal;
         private int _goldTotal;
 
-        private readonly List<Sprite> _uiSprites = new List<Sprite>();
-        private readonly List<Sprite> _lightGrid = new List<Sprite>();
-        private readonly List<Projectile> _playerProjectiles = new List<Projectile>();
-        private readonly List<Item> _items = new List<Item>();
-        private readonly List<Enemy> _enemies = new List<Enemy>();
+        private SoundEffectInstance _gemPickupSound;
+        private SoundEffectInstance _coinPickupSound;
+        private SoundEffectInstance _keyPickupSound;
+        private SoundEffectInstance _playerHitSound;
 
         public RoguelikeGame()
         {
@@ -114,6 +119,11 @@ namespace Roguelike
             _aimSprite = new Sprite(Content.Load<Texture2D>("UI/spr_aim"));
             _aimSprite.Origin = new Vector2(16.5f, 16.5f);
             _aimSprite.Scale = new Vector2(2.0f);
+
+            _gemPickupSound = Content.Load<SoundEffect>("Sounds/snd_gem_pickup").CreateInstance();
+            _coinPickupSound = Content.Load<SoundEffect>("Sounds/snd_coin_pickup").CreateInstance();
+            _keyPickupSound = Content.Load<SoundEffect>("Sounds/snd_key_pickup").CreateInstance();
+            _playerHitSound = Content.Load<SoundEffect>("Sounds/snd_player_hit").CreateInstance();
         }
 
         private void LoadUI()
@@ -343,10 +353,12 @@ namespace Roguelike
                 {
                     case ItemType.Gem:
                         _scoreTotal += ((Gem)item).ScoreValue;
+                        PlaySound(_gemPickupSound);
                         break;
 
                     case ItemType.Gold:
                         _goldTotal += ((Gold)item).GoldValue;
+                        PlaySound(_coinPickupSound);
                         break;
 
                     case ItemType.Heart:
@@ -356,6 +368,7 @@ namespace Roguelike
                     case ItemType.Key:
                         _level.UnlockDoor();
                         _keyUiSprite.Color = Color.White;
+                        PlaySound(_keyPickupSound);
                         break;
 
                     case ItemType.Potion:
@@ -429,7 +442,10 @@ namespace Roguelike
 
                 var enemyTile = _level.GetTile(enemy.Position);
                 if (enemyTile == playerTile && _player.CanTakeDamage)
+                {
                     _player.TakeDamage(10);
+                    PlaySound(_playerHitSound);
+                }
 
                 foreach (var projectile in _playerProjectiles)
                 {
@@ -600,6 +616,12 @@ namespace Roguelike
                 scale: scale, 
                 effects: SpriteEffects.None, 
                 layerDepth: 0.0f);
+        }
+
+        private void PlaySound(SoundEffectInstance sound)
+        {
+            sound.Pitch = Rand.Next(-5, 5) / 100.0f;
+            sound.Play();
         }
     }
 }
