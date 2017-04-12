@@ -38,6 +38,8 @@ namespace Roguelike
         private readonly List<Projectile> _playerProjectiles = new List<Projectile>();
         private readonly List<Item> _items = new List<Item>();
         private readonly List<Enemy> _enemies = new List<Enemy>();
+        private readonly AudioListener _audioListener = new AudioListener();
+        private readonly AudioEmitter _audioEmitter = new AudioEmitter();
 
         private Camera _camera;
         private ViewportAdapter _viewportAdapter;
@@ -60,6 +62,7 @@ namespace Roguelike
         private int _scoreTotal;
         private int _goldTotal;
 
+        private SoundEffectInstance _enemyDieSound;
         private SoundEffectInstance _gemPickupSound;
         private SoundEffectInstance _coinPickupSound;
         private SoundEffectInstance _keyPickupSound;
@@ -120,6 +123,9 @@ namespace Roguelike
             _aimSprite.Origin = new Vector2(16.5f, 16.5f);
             _aimSprite.Scale = new Vector2(2.0f);
 
+            SoundEffect.DistanceScale = 80.0f;
+
+            _enemyDieSound = Content.Load<SoundEffect>("Sounds/snd_enemy_dead").CreateInstance();
             _gemPickupSound = Content.Load<SoundEffect>("Sounds/snd_gem_pickup").CreateInstance();
             _coinPickupSound = Content.Load<SoundEffect>("Sounds/snd_coin_pickup").CreateInstance();
             _keyPickupSound = Content.Load<SoundEffect>("Sounds/snd_key_pickup").CreateInstance();
@@ -315,6 +321,8 @@ namespace Roguelike
 
             var playerPosition = _player.Position;
 
+            _audioListener.Position = new Vector3(playerPosition, 0.0f);
+
             if (_player.IsAttacking)
             {
                 _player.IsAttacking = false;
@@ -479,6 +487,8 @@ namespace Roguelike
                         SpawnItem(ItemType.Potion, position);
                     }
 
+                    PlaySound(_enemyDieSound, enemy.Position);
+
                     _enemies.RemoveAt(i);
                     break;
                 }
@@ -618,9 +628,16 @@ namespace Roguelike
                 layerDepth: 0.0f);
         }
 
-        private void PlaySound(SoundEffectInstance sound)
+        private void PlaySound(SoundEffectInstance sound, Vector2? position = null)
         {
             sound.Pitch = Rand.Next(-5, 5) / 100.0f;
+
+            if (position.HasValue)
+            {
+                _audioEmitter.Position = new Vector3(position.Value, 0.0f);
+                sound.Apply3D(_audioListener, _audioEmitter);
+            }
+
             sound.Play();
         }
     }
