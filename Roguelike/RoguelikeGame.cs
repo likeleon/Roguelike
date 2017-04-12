@@ -9,7 +9,6 @@ using Roguelike.Utils;
 using Roguelike.ViewportAdapters;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Roguelike
 {
@@ -351,16 +350,7 @@ namespace Roguelike
 
             UpdateProjectiles(gameTime);
 
-            var closestTorch = _level.Torches.Aggregate((Torch)null, (closest, current) =>
-            {
-                if (closest == null)
-                    return current;
-
-                if (Vector2.Distance(_player.Position, current.Position) < Vector2.Distance(_player.Position, closest.Position))
-                    return current;
-
-                return closest;
-            });
+            var closestTorch = _level.Torches.WithMinimum(torch => Vector2.Distance(_player.Position, torch.Position));
             if (closestTorch != null)
                 _fireAmbientSound.SetPosition(closestTorch.Position);
 
