@@ -4,10 +4,12 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Roguelike.Graphics;
 using Roguelike.Objects;
+using Roguelike.Sounds;
 using Roguelike.Utils;
 using Roguelike.ViewportAdapters;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Roguelike
 {
@@ -62,6 +64,7 @@ namespace Roguelike
         private int _scoreTotal;
         private int _goldTotal;
 
+        private AmbientSound _fireAmbientSound;
         private SoundEffect _enemyDieSound;
         private SoundEffect _gemPickupSound;
         private SoundEffect _coinPickupSound;
@@ -125,6 +128,10 @@ namespace Roguelike
 
             SoundEffect.DistanceScale = 80.0f;
 
+            _audioListener.Forward = Vector3.UnitY;
+            _audioListener.Up = Vector3.UnitZ;
+
+            _fireAmbientSound = new AmbientSound(Content.Load<SoundEffect>("Sounds/snd_fire"), _audioListener);
             _enemyDieSound = Content.Load<SoundEffect>("Sounds/snd_enemy_dead");
             _gemPickupSound = Content.Load<SoundEffect>("Sounds/snd_gem_pickup");
             _coinPickupSound = Content.Load<SoundEffect>("Sounds/snd_coin_pickup");
@@ -343,6 +350,19 @@ namespace Roguelike
             UpdateEnemies(gameTime);
 
             UpdateProjectiles(gameTime);
+
+            var closestTorch = _level.Torches.Aggregate((Torch)null, (closest, current) =>
+            {
+                if (closest == null)
+                    return current;
+
+                if (Vector2.Distance(_player.Position, current.Position) < Vector2.Distance(_player.Position, closest.Position))
+                    return current;
+
+                return closest;
+            });
+            if (closestTorch != null)
+                _fireAmbientSound.SetPosition(closestTorch.Position);
 
             _camera.Position = playerPosition;
 
