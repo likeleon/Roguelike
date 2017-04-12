@@ -62,11 +62,11 @@ namespace Roguelike
         private int _scoreTotal;
         private int _goldTotal;
 
-        private SoundEffectInstance _enemyDieSound;
-        private SoundEffectInstance _gemPickupSound;
-        private SoundEffectInstance _coinPickupSound;
-        private SoundEffectInstance _keyPickupSound;
-        private SoundEffectInstance _playerHitSound;
+        private SoundEffect _enemyDieSound;
+        private SoundEffect _gemPickupSound;
+        private SoundEffect _coinPickupSound;
+        private SoundEffect _keyPickupSound;
+        private SoundEffect _playerHitSound;
 
         public RoguelikeGame()
         {
@@ -125,11 +125,11 @@ namespace Roguelike
 
             SoundEffect.DistanceScale = 80.0f;
 
-            _enemyDieSound = Content.Load<SoundEffect>("Sounds/snd_enemy_dead").CreateInstance();
-            _gemPickupSound = Content.Load<SoundEffect>("Sounds/snd_gem_pickup").CreateInstance();
-            _coinPickupSound = Content.Load<SoundEffect>("Sounds/snd_coin_pickup").CreateInstance();
-            _keyPickupSound = Content.Load<SoundEffect>("Sounds/snd_key_pickup").CreateInstance();
-            _playerHitSound = Content.Load<SoundEffect>("Sounds/snd_player_hit").CreateInstance();
+            _enemyDieSound = Content.Load<SoundEffect>("Sounds/snd_enemy_dead");
+            _gemPickupSound = Content.Load<SoundEffect>("Sounds/snd_gem_pickup");
+            _coinPickupSound = Content.Load<SoundEffect>("Sounds/snd_coin_pickup");
+            _keyPickupSound = Content.Load<SoundEffect>("Sounds/snd_key_pickup");
+            _playerHitSound = Content.Load<SoundEffect>("Sounds/snd_player_hit");
         }
 
         private void LoadUI()
@@ -628,17 +628,17 @@ namespace Roguelike
                 layerDepth: 0.0f);
         }
 
-        private void PlaySound(SoundEffectInstance sound, Vector2? position = null)
+        private void PlaySound(SoundEffect sound, Vector2? position = null)
         {
-            sound.Pitch = Rand.Next(-5, 5) / 100.0f;
+            var instance = sound.CreateInstance();
+            instance.Pitch = Rand.Next(-5, 5) / 100.0f;
+            instance.Play();
 
             if (position.HasValue)
             {
                 _audioEmitter.Position = new Vector3(position.Value, 0.0f);
-                sound.Apply3D(_audioListener, _audioEmitter);
+                instance.Apply3D(_audioListener, _audioEmitter);
             }
-
-            sound.Play();
         }
     }
 }
