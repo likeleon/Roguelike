@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using Roguelike.Graphics;
 using Roguelike.Objects;
 using Roguelike.Sounds;
@@ -63,6 +64,7 @@ namespace Roguelike
         private int _scoreTotal;
         private int _goldTotal;
 
+        private Song _music;
         private AmbientSound _fireAmbientSound;
         private SoundEffect _enemyDieSound;
         private SoundEffect _gemPickupSound;
@@ -129,6 +131,10 @@ namespace Roguelike
 
             _audioListener.Forward = Vector3.UnitY;
             _audioListener.Up = Vector3.UnitZ;
+
+            var trackIndex = Rand.Next(1, EnumExtensions.GetCount<MusicTrack>() + 1);
+            _music = Content.Load<Song>($"Music/msc_main_track_{trackIndex}");
+            MediaPlayer.Play(_music);
 
             _fireAmbientSound = new AmbientSound(Content.Load<SoundEffect>("Sounds/snd_fire"), _audioListener);
             _enemyDieSound = Content.Load<SoundEffect>("Sounds/snd_enemy_dead");

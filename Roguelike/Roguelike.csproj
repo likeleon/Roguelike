@@ -44,6 +44,7 @@
     <Compile Include="Global.cs" />
     <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Graphics\IDrawable.cs" />
+    <Compile Include="MusicTrack.cs" />
     <Compile Include="Objects\Enemies\Enemy.cs" />
     <Compile Include="Objects\Enemies\EnemyTextureFactory.cs" />
     <Compile Include="Objects\Enemies\EnemyType.cs" />

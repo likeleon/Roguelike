@@ -1670,3 +1670,27 @@
 /processorParam:Quality=Best
 /build:Sounds/snd_player_hit.wav
 
+#begin Music/msc_main_track_1.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Music/msc_main_track_1.wav
+
+#begin Music/msc_main_track_2.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Music/msc_main_track_2.wav
+
+#begin Music/msc_main_track_3.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Music/msc_main_track_3.wav
+
+#begin Music/msc_main_track_4.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Music/msc_main_track_4.wav
+
