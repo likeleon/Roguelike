@@ -13,5 +13,7 @@ namespace Roguelike
         {
             Index = index;
         }
+
+        public bool IsFloor => Type == TileType.Floor || Type == TileType.FloorAlt;
     }
 }

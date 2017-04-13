@@ -72,6 +72,8 @@ namespace Roguelike
         private SoundEffect _keyPickupSound;
         private SoundEffect _playerHitSound;
 
+        private Tile _playerPreviousTile;
+
         public RoguelikeGame()
         {
             Content.RootDirectory = "Content";
@@ -360,6 +362,19 @@ namespace Roguelike
             if (closestTorch != null)
                 _fireAmbientSound.SetPosition(closestTorch.Position);
 
+            var playerCurrentTile = _level.GetTile(playerPosition);
+            if (_playerPreviousTile != playerCurrentTile)
+            {
+                _playerPreviousTile = playerCurrentTile;
+                foreach (var enemy in _enemies)
+                {
+                    if (Vector2.Distance(enemy.Position, playerPosition) >= 300.0f)
+                        continue;
+
+                    enemy.UpdatePathFinding(_level, playerPosition);
+                }
+            }
+
             _camera.Position = playerPosition;
 
             base.Update(gameTime);
@@ -471,6 +486,7 @@ namespace Roguelike
                     PlaySound(_playerHitSound);
                 }
 
+                bool enemyWasRemoved = false;
                 foreach (var projectile in _playerProjectiles)
                 {
                     if (enemyTile != _level.GetTile(projectile.Position))
@@ -506,8 +522,12 @@ namespace Roguelike
                     PlaySound(_enemyDieSound, enemy.Position);
 
                     _enemies.RemoveAt(i);
+                    enemyWasRemoved = true;
                     break;
                 }
+
+                if (!enemyWasRemoved)
+                    enemy.Update(gameTime);
             }
         }
 

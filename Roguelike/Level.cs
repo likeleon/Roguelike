@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Roguelike.Graphics;
 using Roguelike.Objects;
+using Roguelike.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,9 +16,17 @@ namespace Roguelike
         public static int GridWidth = 19;
         public static int GridHeight = 19;
 
+        private static readonly Point[] AdjacentTileIndexOffsets = new Point[]
+        {
+            new Point(0, -1),
+            new Point(1, 0),
+            new Point(0, 1),
+            new Point(-1, 0)
+        };
+
         private readonly ContentManager _content;
         private readonly Texture2D[] _tileTextures = new Texture2D[EnumExtensions.GetCount<TileType>()];
-        private readonly Tile[,] _grid = new Tile[GridWidth, GridHeight];
+        private readonly Tile[,] _tiles = new Tile[GridWidth, GridHeight];
         private readonly List<Torch> _torches = new List<Torch>();
         private Point? _doorTileIndices;
 
@@ -63,9 +72,9 @@ namespace Roguelike
             var originY = (screenSize.Y - GridHeight * TileSize) / 2;
             Origin = new Point(originX, originY);
 
-            for (int x = 0; x < _grid.GetLength(0); ++x)
-                for (int y = 0; y < _grid.GetLength(1); ++y)
-                    _grid[x, y] = new Tile(new Point(x, y));
+            for (int x = 0; x < _tiles.GetLength(0); ++x)
+                for (int y = 0; y < _tiles.GetLength(1); ++y)
+                    _tiles[x, y] = new Tile(new Point(x, y));
         }
 
         public void SetTileTexture(string assetName, TileType tileType)
@@ -92,7 +101,7 @@ namespace Roguelike
             {
                 int x = i % GridWidth;
                 int y = i / GridWidth;
-                var tile = _grid[x, y];
+                var tile = _tiles[x, y];
 
                 tile.Type = (TileType)tileIds[i];
                 tile.Sprite = new Sprite(_tileTextures[tileIds[i]]);
@@ -122,19 +131,27 @@ namespace Roguelike
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            foreach (var tile in _grid)
+            foreach (var tile in _tiles)
                 tile.Sprite.Draw(spriteBatch);
 
             foreach (var torch in _torches)
                 torch.Draw(spriteBatch, gameTime);
         }
 
-        public Tile GetTile(Vector2 index)
+        public Tile GetTile(Vector2 position)
         {
-            index -= Origin.ToVector2();
-            var x = (int)index.X / TileSize;
-            var y = (int)index.Y / TileSize;
-            return _grid[x, y];
+            position -= Origin.ToVector2();
+            var x = (int)position.X / TileSize;
+            var y = (int)position.Y / TileSize;
+            return _tiles[x, y];
+        }
+
+        public Tile GetTileByIndex(Point tileIndex)
+        {
+            if (!TileIsValid(tileIndex))
+                return null;
+
+            return _tiles[tileIndex.X, tileIndex.Y];
         }
 
         public void SetTile(Point index, TileType tileType)
@@ -142,7 +159,7 @@ namespace Roguelike
             if (!TileIsValid(index))
                 return;
 
-            var tile = _grid[index.X, index.Y];
+            var tile = _tiles[index.X, index.Y];
             tile.Type = tileType;
             tile.Sprite.SetTexture(_tileTextures[(int)tileType]);
         }
@@ -152,7 +169,7 @@ namespace Roguelike
             if (!TileIsValid(tileIndex))
                 return false;
 
-            var tileType = _grid[tileIndex.X, tileIndex.Y].Type;
+            var tileType = _tiles[tileIndex.X, tileIndex.Y].Type;
             return tileType != TileType.Floor &&
                 tileType != TileType.FloorAlt &&
                 tileType != TileType.WallDoorUnlocked;
@@ -192,17 +209,89 @@ namespace Roguelike
             return tileLocation;
         }
 
-        public bool IsFloor(Point tileIndex)
-        {
-            var tileType = _grid[tileIndex.X, tileIndex.Y].Type;
-            return tileType == TileType.Floor || tileType == TileType.FloorAlt;
-        }
+        public bool IsFloor(Point tileIndex) => _tiles[tileIndex.X, tileIndex.Y].IsFloor;
 
-        private Vector2 GetActualTileLocation(Point tileIndex)
+        public Vector2 GetActualTileLocation(Point tileIndex)
         {
             return new Vector2(
                 x: Origin.X + (tileIndex.X * TileSize) + (TileSize / 2),
                 y: Origin.Y + (tileIndex.Y * TileSize) + (TileSize / 2));
+        }
+
+        public Tile[] GetShortestPath(Tile start, Tile goal)
+        {
+            var closedSet = new HashSet<Tile>();
+
+            var openSet = new HashSet<Tile>();
+            openSet.Add(start);
+
+            var cameFrom = new Dictionary<Tile, Tile>();
+
+            var exactCosts = new Dictionary<Tile, int>();
+            exactCosts.Add(start, 0);
+
+            var estimatedCosts = new Dictionary<Tile, int>();
+            estimatedCosts.Add(start, EstimateHeuristicCost(start, goal));
+
+            while (openSet.Count > 0)
+            {
+                var current = openSet.WithMinimum(node => estimatedCosts.GetValueOrDefault(node, int.MaxValue));
+                if (current == goal)
+                    return ReconstructPath(cameFrom, current);
+
+                openSet.Remove(current);
+                closedSet.Add(current);
+
+                foreach (var neighbor in GetNeighborFloorTiles(current))
+                {
+                    if (closedSet.Contains(neighbor))
+                        continue;
+
+                    var tentativeCost = exactCosts[current] + 10;
+                    if (!openSet.Contains(neighbor))
+                        openSet.Add(neighbor);
+                    else if (tentativeCost >= exactCosts.GetValueOrDefault(neighbor, int.MaxValue))
+                        continue;
+
+                    cameFrom[neighbor] = current;
+                    exactCosts[neighbor] = tentativeCost;
+                    estimatedCosts[neighbor] = exactCosts[neighbor] + EstimateHeuristicCost(neighbor, goal);
+                }
+            }
+
+            return new Tile[0];
+        }
+
+        private static Tile[] ReconstructPath(Dictionary<Tile, Tile> cameFrom, Tile current)
+        {
+            var path = new List<Tile>();
+
+            path.Add(current);
+            do
+            {
+                if (!cameFrom.TryGetValue(current, out current))
+                    break;
+                path.Add(current);
+            } while (true);
+
+            path.Reverse();
+            return path.ToArray();
+        }
+
+        private IEnumerable<Tile> GetNeighborFloorTiles(Tile tile)
+        {
+            foreach (var indexOffset in AdjacentTileIndexOffsets)
+            {
+                var neighbor = GetTileByIndex(tile.Index + indexOffset);
+                if (neighbor != null && neighbor.IsFloor)
+                    yield return neighbor;
+            }
+        }
+
+        private static int EstimateHeuristicCost(Tile from, Tile to)
+        {
+            var offset = from.Index - to.Index;
+            return Math.Abs(offset.X) + Math.Abs(offset.Y);
         }
     }
 }
