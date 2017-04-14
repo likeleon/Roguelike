@@ -17,6 +17,7 @@ namespace Roguelike
     {
         private static readonly int MaxItemSpawnCount = 50;
         private static readonly int MaxEnemySpawnCount = 20;
+        private static readonly int EnemyDamage = 10;
 
         private static readonly IReadOnlyDictionary<PlayerClass, string> ProjectileNamesByClass = new Dictionary<PlayerClass, string>()
         {
@@ -46,7 +47,6 @@ namespace Roguelike
         private Camera _camera;
         private ViewportAdapter _viewportAdapter;
 
-        private SpriteFont _font;
         private Texture2D _projectileTexture;
 
         private Level _level;
@@ -107,7 +107,7 @@ namespace Roguelike
 
         protected override void LoadContent()
         {
-            _font = Content.Load<SpriteFont>("Fonts/ADDSBP__");
+            Global.Font = Content.Load<SpriteFont>("Fonts/ADDSBP__");
 
             _player = new Player(Content);
             _player.Position = _virtualCenter.ToVector2() + new Vector2(197.0f, 410.0f);
@@ -482,7 +482,7 @@ namespace Roguelike
                 var enemyTile = _level.GetTile(enemy.Position);
                 if (enemyTile == playerTile && _player.CanTakeDamage)
                 {
-                    _player.TakeDamage(10);
+                    _player.TakeDamage(EnemyDamage);
                     PlaySound(_playerHitSound);
                 }
 
@@ -553,7 +553,7 @@ namespace Roguelike
                     break;
 
                 case ItemType.Key:
-                    item = new Key(Content, _font);
+                    item = new Key(Content);
                     break;
 
                 default:
@@ -655,8 +655,8 @@ namespace Roguelike
 
         private void DrawString(string text, Vector2 position, float scale)
         {
-            var textSize = _font.MeasureString(text);
-            Global.SpriteBatch.DrawString(_font, text, position, Color.White, 
+            var textSize = Global.Font.MeasureString(text);
+            Global.SpriteBatch.DrawString(Global.Font, text, position, Color.White, 
                 rotation: 0.0f, 
                 origin: textSize / 2.0f, 
                 scale: scale, 

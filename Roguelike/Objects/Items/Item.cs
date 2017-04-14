@@ -6,7 +6,6 @@ namespace Roguelike.Objects
 {
     public abstract class Item : Object
     {
-        private SpriteFont _font;
         private Vector2 _textOffset;
 
         public string Name { get; private set; }
@@ -17,12 +16,11 @@ namespace Roguelike.Objects
             ItemType = itemType;
         }
 
-        protected void SetName(string name, SpriteFont font)
+        protected void SetName(string name)
         {
             Name = name;
 
-            _font = font;
-            _textOffset = font.MeasureString(name) / 2.0f + new Vector2(0.0f, 30.0f);
+            _textOffset = Global.Font.MeasureString(name) / 2.0f + new Vector2(0.0f, 30.0f);
         }
 
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
@@ -30,7 +28,7 @@ namespace Roguelike.Objects
             base.Draw(spriteBatch, gameTime);
 
             if (!Name.IsNullOrEmpty())
-                spriteBatch.DrawString(_font, Name, Position - _textOffset, Color.White);
+                spriteBatch.DrawString(Global.Font, Name, Position - _textOffset, Color.White);
         }
     }
 }
