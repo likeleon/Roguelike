@@ -61,6 +61,7 @@ namespace Roguelike
         private Sprite _dexterityStatSprite;
         private Sprite _staminaStatSprite;
 
+        private Quest _quest;
         private int _scoreTotal;
         private int _goldTotal;
 
@@ -117,6 +118,8 @@ namespace Roguelike
             PopulateLevel();
             _level.SetTileTexture("Tiles/spr_tile_floor_alt", TileType.FloorAlt);
             SpawnRandomTiles(TileType.FloorAlt, count: 15);
+
+            _quest = Quest.CreateRandom();
 
             var projectileName = ProjectileNamesByClass[_player.Class];
             _projectileTexture = Content.Load<Texture2D>($"Projectiles/spr_{projectileName}");
@@ -377,6 +380,12 @@ namespace Roguelike
 
             _camera.Position = playerPosition;
 
+            if (_quest != null && _quest.IsCompleted)
+            {
+                _scoreTotal += Rand.Next(1000, 2001);
+                _quest = null;
+            }
+
             base.Update(gameTime);
         }
 
@@ -392,12 +401,24 @@ namespace Roguelike
                 {
                     case ItemType.Gem:
                         _scoreTotal += ((Gem)item).ScoreValue;
+
+                        if (_quest?.QuestType == QuestType.CollectGem)
+                            _quest.DecreaseGoal(amount: 1);
+
                         PlaySound(_gemPickupSound);
                         break;
 
                     case ItemType.Gold:
-                        _goldTotal += ((Gold)item).GoldValue;
-                        PlaySound(_coinPickupSound);
+                        {
+                            var goldValue = ((Gold)item).GoldValue;
+
+                            _goldTotal += goldValue;
+
+                            if (_quest?.QuestType == QuestType.CollectGold)
+                                _quest.DecreaseGoal(goldValue);
+
+                            PlaySound(_coinPickupSound);
+                        }
                         break;
 
                     case ItemType.Heart:
@@ -521,6 +542,9 @@ namespace Roguelike
 
                     PlaySound(_enemyDieSound, enemy.Position);
 
+                    if (_quest?.QuestType == QuestType.KillEnemy)
+                        _quest.DecreaseGoal(amount: 1);
+
                     _enemies.RemoveAt(i);
                     enemyWasRemoved = true;
                     break;
@@ -627,6 +651,11 @@ namespace Roguelike
 
             _aimSprite.Draw(spriteBatch);
 
+            // Quest
+            if (_quest != null)
+                DrawString(_quest.Title, new Vector2(_virtualSize.X / 2.0f, _virtualSize.Y - 75.0f), 1.3f);
+
+            // Draw player stats
             DrawString(_player.Attack.ToString(), new Vector2(_virtualCenter.X - 210.0f, _virtualSize.Y - 25.0f), 1.5f);
             DrawString(_player.Defense.ToString(), new Vector2(_virtualCenter.X - 90.0f, _virtualSize.Y - 25.0f), 1.5f);
             DrawString(_player.Strength.ToString(), new Vector2(_virtualCenter.X + 30.0f, _virtualSize.Y - 25.0f), 1.5f);
