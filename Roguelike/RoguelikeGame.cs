@@ -19,6 +19,9 @@ namespace Roguelike
         private static readonly int MaxEnemySpawnCount = 20;
         private static readonly int EnemyDamage = 10;
 
+        private static readonly Color KeyNotColletedColor = new Color(255, 255, 255) * 0.235f;
+        private static readonly Color KeyCollectedColor = Color.White;
+
         private static readonly IReadOnlyDictionary<PlayerClass, string> ProjectileNamesByClass = new Dictionary<PlayerClass, string>()
         {
             [PlayerClass.Archer] = "arrow",
@@ -102,7 +105,7 @@ namespace Roguelike
             Global.SpriteBatch = new SpriteBatch(GraphicsDevice);
 
             //Global.DebugPathFinding = true;
-            Global.DebugLevelGeneration = true;
+            //Global.DebugLevelGeneration = true;
 
             _viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, _virtualSize);
 
@@ -229,7 +232,7 @@ namespace Roguelike
             {
                 Position = _virtualSize.ToVector2() - new Vector2(120.0f, 70.0f),
                 Origin = new Vector2(90.0f, 45.0f),
-                Color = new Color(255, 255, 255) * 0.235f
+                Color = KeyNotColletedColor
             };
             _uiSprites.Add(_keyUiSprite);
 
@@ -337,6 +340,15 @@ namespace Roguelike
             if (Order.IsOrderIssued(OrderType.Cancel))
                 Exit();
 
+            var playerTile = _level.GetTile(_player.Position);
+            if (playerTile.Type == TileType.WallDoorUnlocked)
+            {
+                _items.Clear();
+                _enemies.Clear();
+                GenerateLevel();
+                _keyUiSprite.Color = KeyNotColletedColor;
+            }
+
             _player.Update(gameTime, _level, _camera);
 
             _aimSprite.Position = _viewportAdapter.PointToScreen(Mouse.GetState().Position).ToVector2();
@@ -432,7 +444,7 @@ namespace Roguelike
 
                     case ItemType.Key:
                         _level.UnlockDoor();
-                        _keyUiSprite.Color = Color.White;
+                        _keyUiSprite.Color = KeyCollectedColor;
                         PlaySound(_keyPickupSound);
                         break;
 
