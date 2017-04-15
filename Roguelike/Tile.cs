@@ -15,5 +15,7 @@ namespace Roguelike
         }
 
         public bool IsFloor => Type == TileType.Floor || Type == TileType.FloorAlt;
+
+        public bool IsWall => Type <= TileType.WallIntersection;
     }
 }

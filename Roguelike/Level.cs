@@ -175,6 +175,8 @@ namespace Roguelike
             CreatePath(new Point(1, 1));
 
             CreateRooms(roomCount: 10);
+
+            UpdateTileTextures();
         }
 
         public Tile GetTileByIndex(Point tileIndex)
@@ -251,6 +253,36 @@ namespace Roguelike
                     }
                 }
             });
+        }
+
+        private void UpdateTileTextures()
+        {
+            for (var x = 0; x < GridWidth; ++x)
+            {
+                for (var y = 0; y < GridHeight; ++y)
+                {
+                    if (!IsWall(x, y))
+                        continue;
+
+                    var tileType = 0;
+                    if (IsWall(x, y - 1))
+                        tileType += 1;
+                    if (IsWall(x + 1, y))
+                        tileType += 2;
+                    if (IsWall(x, y + 1))
+                        tileType += 4;
+                    if (IsWall(x - 1, y))
+                        tileType += 8;
+
+                    SetTileType(_tiles[x, y], (TileType)tileType);
+                }
+            }
+        }
+
+        private bool IsWall(int indexX, int indexY)
+        {
+            var tile = GetTileByIndex(new Point(indexX, indexY));
+            return tile?.IsWall == true;
         }
 
         public bool IsSolid(Point tileIndex)
