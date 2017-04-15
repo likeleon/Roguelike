@@ -94,14 +94,17 @@ namespace Roguelike
 
         protected override void Initialize()
         {
+            Global.Content = Content;
+            Global.GraphicsDevice = GraphicsDevice;
+            Global.SpriteBatch = new SpriteBatch(GraphicsDevice);
+          
+            //Global.DebugPathFinding = true;
+            //Global.DebugLevelGeneration = true;
+
             _viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, _virtualSize);
 
             _camera = new Camera(_viewportAdapter);
             _camera.Zoom = 2.0f;
-
-            Global.Content = Content;
-            Global.GraphicsDevice = GraphicsDevice;
-            Global.SpriteBatch = new SpriteBatch(GraphicsDevice);
 
             base.Initialize();
         }
@@ -111,20 +114,14 @@ namespace Roguelike
             Global.Font = Content.Load<SpriteFont>("Fonts/ADDSBP__");
 
             _player = new Player(Content);
-            _player.Position = _virtualCenter.ToVector2() + new Vector2(197.0f, 410.0f);
 
-            _level = new Level(Content, _virtualSize);
-            _level.LoadFromFile("Content/Data/level_data.txt");
-            PopulateLevel();
-            _level.SetTileTexture("Tiles/spr_tile_floor_alt", TileType.FloorAlt);
-            SpawnRandomTiles(TileType.FloorAlt, count: 15);
-
-            _quest = Quest.CreateRandom();
+            GenerateLevel();
 
             var projectileName = ProjectileNamesByClass[_player.Class];
             _projectileTexture = Content.Load<Texture2D>($"Projectiles/spr_{projectileName}");
 
-            ConstructLightGrid();
+            if (!Global.DebugLevelGeneration)
+                ConstructLightGrid();
 
             LoadUI();
 
@@ -147,6 +144,26 @@ namespace Roguelike
             _coinPickupSound = Content.Load<SoundEffect>("Sounds/snd_coin_pickup");
             _keyPickupSound = Content.Load<SoundEffect>("Sounds/snd_key_pickup");
             _playerHitSound = Content.Load<SoundEffect>("Sounds/snd_player_hit");
+        }
+
+        private void GenerateLevel()
+        {
+            _level = new Level(Content, _virtualSize);
+            _level.GenerateLevel();
+
+            if (!Global.DebugLevelGeneration)
+            {
+                SpawnItem(ItemType.Key);
+
+                PopulateLevel();
+
+                _level.SetTileTexture("Tiles/spr_tile_floor_alt", TileType.FloorAlt);
+                SpawnRandomTiles(TileType.FloorAlt, count: 15);
+            }
+
+            _quest = Quest.CreateRandom();
+
+            _player.Position = _virtualCenter.ToVector2() + new Vector2(197.0f, 410.0f);
         }
 
         private void LoadUI()
@@ -318,7 +335,7 @@ namespace Roguelike
                         Rand.Next(Level.GridHeight));
                 }
 
-                _level.SetTile(tileIndex, tileType);
+                _level.SetTileType(tileIndex, tileType);
             });
         }
 
@@ -627,7 +644,9 @@ namespace Roguelike
 
             var spriteBatch = Global.SpriteBatch;
 
-            spriteBatch.Begin(transformMatrix: _camera.GetViewMatrix());
+            var worldTransformMatrix = Global.DebugLevelGeneration ? 
+                _viewportAdapter.GetScaleMatrix() : _camera.GetViewMatrix();
+            spriteBatch.Begin(transformMatrix: worldTransformMatrix);
 
             _level.Draw(spriteBatch, gameTime);
 

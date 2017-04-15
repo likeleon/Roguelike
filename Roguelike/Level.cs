@@ -24,6 +24,14 @@ namespace Roguelike
             new Point(-1, 0)
         };
 
+        private static readonly Point[] GeneratePathDirections = new Point[]
+        {
+            new Point(0, -2),
+            new Point(2, 0),
+            new Point(0, 2),
+            new Point(-2, 0)
+        };
+
         private readonly ContentManager _content;
         private readonly Texture2D[] _tileTextures = new Texture2D[EnumExtensions.GetCount<TileType>()];
         private readonly Tile[,] _tiles = new Tile[GridWidth, GridHeight];
@@ -146,6 +154,27 @@ namespace Roguelike
             return _tiles[x, y];
         }
 
+        public void GenerateLevel()
+        {
+            for (var x = 0; x < GridWidth; ++x)
+            {
+                for (var y = 0; y < GridHeight; ++y)
+                {
+                    var tile = _tiles[x, y];
+                    tile.Sprite = new Sprite();
+
+                    if ((x % 2 != 0) && (y % 2 != 0))
+                        SetTileType(tile, TileType.Empty);
+                    else
+                        SetTileType(tile, TileType.WallTop);
+
+                    tile.Sprite.Position = (Origin + new Point(TileSize * x, TileSize * y)).ToVector2();
+                }
+            }
+
+            CreatePath(new Point(1, 1));
+        }
+
         public Tile GetTileByIndex(Point tileIndex)
         {
             if (!TileIsValid(tileIndex))
@@ -154,16 +183,44 @@ namespace Roguelike
             return _tiles[tileIndex.X, tileIndex.Y];
         }
 
-        public void SetTile(Point index, TileType tileType)
+        public void SetTileType(Point index, TileType tileType)
         {
             if (!TileIsValid(index))
                 return;
 
             var tile = _tiles[index.X, index.Y];
-            tile.Type = tileType;
-            tile.Sprite.SetTexture(_tileTextures[(int)tileType]);
+            SetTileType(tile, tileType);
         }
 
+        private void SetTileType(Tile tile, TileType tileType)
+        {
+            tile.Type = tileType;
+
+            var tileTexture = _tileTextures[(int)tileType];
+            if (tileTexture != null)
+                tile.Sprite.SetTexture(tileTexture);
+        }
+
+        private void CreatePath(Point startTileIndex)
+        {
+            var startTile = GetTileByIndex(startTileIndex);
+
+            foreach (var direction in GeneratePathDirections.Shuffle())
+            {
+                var tile = GetTileByIndex(startTileIndex + direction);
+                if (tile?.Type != TileType.Empty)
+                    continue;
+
+                SetTileType(tile, TileType.Floor);
+
+                var wallIndex = startTileIndex + new Point(direction.X / 2, direction.Y / 2);
+                var wall = GetTileByIndex(wallIndex);
+                SetTileType(wall, TileType.Floor);
+
+                CreatePath(tile.Index);
+            }
+        }
+        
         public bool IsSolid(Point tileIndex)
         {
             if (!TileIsValid(tileIndex))
@@ -191,7 +248,7 @@ namespace Roguelike
             if (!_doorTileIndices.HasValue)
                 return;
 
-            SetTile(_doorTileIndices.Value, TileType.WallDoorUnlocked);
+            SetTileType(_doorTileIndices.Value, TileType.WallDoorUnlocked);
         }
 
         public Vector2 GetRandomSpawnLocation()

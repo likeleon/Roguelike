@@ -25,7 +25,12 @@ namespace Roguelike.Utils
             return enumerable
                 .Select(e => Tuple.Create(e, func(e)))
                 .Aggregate((Tuple<T, TKey>)null, (best, cur) => best == null || cur.Item2.CompareTo(best.Item2) < 0 ? cur : best)
-                .Item1;
+                ?.Item1;
+        }
+
+        public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> enumerable)
+        {
+            return enumerable.OrderBy(e => Rand.Next());
         }
     }
 }

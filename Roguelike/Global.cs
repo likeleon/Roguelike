@@ -10,6 +10,7 @@ namespace Roguelike
         public static SpriteBatch SpriteBatch { get; set; }
         public static SpriteFont Font { get; set; }
 
-        public static bool PathDebugIsEnabled { get; set; }
+        public static bool DebugPathFinding { get; set; }
+        public static bool DebugLevelGeneration { get; set; }
     }
 }

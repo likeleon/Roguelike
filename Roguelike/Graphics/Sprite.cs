@@ -26,6 +26,9 @@ namespace Roguelike.Graphics
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            if (Texture == null)
+                return;
+
             spriteBatch.Draw(Texture, Position, TextureRect, Color, 
                 Rotation, Origin, Scale, SpriteEffects.None, 0);
         }

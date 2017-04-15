@@ -72,7 +72,7 @@ namespace Roguelike.Objects
         {
             base.Draw(spriteBatch, gameTime);
 
-            if (Global.PathDebugIsEnabled)
+            if (Global.DebugPathFinding)
             {
                 for (int i = 0; i < _targetPositions.Count; ++i)
                 {
