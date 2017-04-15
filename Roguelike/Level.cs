@@ -45,6 +45,7 @@ namespace Roguelike
         public Point Size => new Point(GridWidth, GridHeight);
         public int TileSize { get; } = 50;
         public IEnumerable<Torch> Torches => _torches;
+        public Vector2 PlayerSpawnLocation { get; private set; }
 
         public Level(ContentManager content, Point screenSize)
         {
@@ -177,6 +178,8 @@ namespace Roguelike
             CreateRooms(roomCount: 10);
 
             UpdateTileTextures();
+
+            GenerateEntryExit();
         }
 
         public Tile GetTileByIndex(Point tileIndex)
@@ -283,6 +286,29 @@ namespace Roguelike
         {
             var tile = GetTileByIndex(new Point(indexX, indexY));
             return tile?.IsWall == true;
+        }
+
+        private void GenerateEntryExit()
+        {
+            Func<int, Point> getRandomWallTopIndex = y =>
+            {
+                while (true)
+                {
+                    var x = Rand.Next(GridWidth);
+                    if (_tiles[x, y].Type == TileType.WallTop)
+                        return new Point(x, y);
+                }
+            };
+
+            var entrance = getRandomWallTopIndex(GridHeight - 1);
+            SetTileType(entrance, TileType.WallEntrance);
+
+            var exit = getRandomWallTopIndex(0);
+            SetTileType(exit, TileType.WallDoorLocked);
+
+            _doorTileIndices = exit;
+
+            PlayerSpawnLocation = GetActualTileLocation(entrance - new Point(0, 1));
         }
 
         public bool IsSolid(Point tileIndex)

@@ -156,14 +156,14 @@ namespace Roguelike
                 SpawnItem(ItemType.Key);
 
                 PopulateLevel();
-
-                _level.SetTileTexture("Tiles/spr_tile_floor_alt", TileType.FloorAlt);
-                SpawnRandomTiles(TileType.FloorAlt, count: 15);
             }
+
+            _level.SetTileTexture("Tiles/spr_tile_floor_alt", TileType.FloorAlt);
+            SpawnRandomTiles(TileType.FloorAlt, count: 15);
 
             _quest = Quest.CreateRandom();
 
-            _player.Position = _virtualCenter.ToVector2() + new Vector2(197.0f, 410.0f);
+            _player.Position = _level.PlayerSpawnLocation;
         }
 
         private void LoadUI()
