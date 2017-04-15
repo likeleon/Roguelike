@@ -80,10 +80,12 @@ namespace Roguelike
         {
             Content.RootDirectory = "Content";
 
-            _graphics = new GraphicsDeviceManager(this);
-            _graphics.PreferredBackBufferWidth = 1280;
-            _graphics.PreferredBackBufferHeight = 800;
-            _graphics.SynchronizeWithVerticalRetrace = true;
+            _graphics = new GraphicsDeviceManager(this)
+            {
+                PreferredBackBufferWidth = 1280,
+                PreferredBackBufferHeight = 800,
+                SynchronizeWithVerticalRetrace = true
+            };
 
             IsMouseVisible = false;
 
@@ -104,8 +106,10 @@ namespace Roguelike
 
             _viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, _virtualSize);
 
-            _camera = new Camera(_viewportAdapter);
-            _camera.Zoom = 2.0f;
+            _camera = new Camera(_viewportAdapter)
+            {
+                Zoom = 2.0f
+            };
 
             base.Initialize();
         }
@@ -127,9 +131,11 @@ namespace Roguelike
 
             LoadUI();
 
-            _aimSprite = new Sprite(Content.Load<Texture2D>("UI/spr_aim"));
-            _aimSprite.Origin = new Vector2(16.5f, 16.5f);
-            _aimSprite.Scale = new Vector2(2.0f);
+            _aimSprite = new Sprite(Content.Load<Texture2D>("UI/spr_aim"))
+            {
+                Origin = new Vector2(16.5f, 16.5f),
+                Scale = new Vector2(2.0f)
+            };
 
             SoundEffect.DistanceScale = 80.0f;
 

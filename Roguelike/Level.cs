@@ -94,8 +94,10 @@ namespace Roguelike
                 var tile = _tiles[x, y];
 
                 tile.Type = (TileType)tileIds[i];
-                tile.Sprite = new Sprite(_tileTextures.GetTexture(tile.Type));
-                tile.Sprite.Position = (Origin + new Point(TileSize * x, TileSize * y)).ToVector2();
+                tile.Sprite = new Sprite(_tileTextures.GetTexture(tile.Type))
+                {
+                    Position = (Origin + new Point(TileSize * x, TileSize * y)).ToVector2()
+                };
 
                 if (tile.Type == TileType.WallDoorLocked)
                     _doorTileIndices = new Point(x, 0);
@@ -315,8 +317,10 @@ namespace Roguelike
             {
                 var tile = getRandomWallTopTile();
 
-                var torch = new Torch();
-                torch.Position = GetActualTileLocation(tile.Index);
+                var torch = new Torch()
+                {
+                    Position = GetActualTileLocation(tile.Index)
+                };
                 _torches.Add(torch);
 
                 usedTiles.Add(tile);
@@ -381,16 +385,17 @@ namespace Roguelike
         {
             var closedSet = new HashSet<Tile>();
 
-            var openSet = new HashSet<Tile>();
-            openSet.Add(start);
-
+            var openSet = new HashSet<Tile> { start };
             var cameFrom = new Dictionary<Tile, Tile>();
 
-            var exactCosts = new Dictionary<Tile, int>();
-            exactCosts.Add(start, 0);
-
-            var estimatedCosts = new Dictionary<Tile, int>();
-            estimatedCosts.Add(start, EstimateHeuristicCost(start, goal));
+            var exactCosts = new Dictionary<Tile, int>
+            {
+                { start, 0 }
+            };
+            var estimatedCosts = new Dictionary<Tile, int>
+            {
+                { start, EstimateHeuristicCost(start, goal) }
+            };
 
             while (openSet.Count > 0)
             {
@@ -423,9 +428,7 @@ namespace Roguelike
 
         private static Tile[] ReconstructPath(Dictionary<Tile, Tile> cameFrom, Tile current)
         {
-            var path = new List<Tile>();
-
-            path.Add(current);
+            var path = new List<Tile> { current };
             do
             {
                 if (!cameFrom.TryGetValue(current, out current))
