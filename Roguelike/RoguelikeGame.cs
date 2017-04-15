@@ -97,9 +97,9 @@ namespace Roguelike
             Global.Content = Content;
             Global.GraphicsDevice = GraphicsDevice;
             Global.SpriteBatch = new SpriteBatch(GraphicsDevice);
-          
+
             //Global.DebugPathFinding = true;
-            //Global.DebugLevelGeneration = true;
+            Global.DebugLevelGeneration = true;
 
             _viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, _virtualSize);
 

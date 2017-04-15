@@ -173,6 +173,8 @@ namespace Roguelike
             }
 
             CreatePath(new Point(1, 1));
+
+            CreateRooms(roomCount: 10);
         }
 
         public Tile GetTileByIndex(Point tileIndex)
@@ -220,7 +222,37 @@ namespace Roguelike
                 CreatePath(tile.Index);
             }
         }
-        
+
+        private void CreateRooms(int roomCount)
+        {
+            roomCount.Times(() =>
+            {
+                var roomWidth = Rand.Next(1, 3);
+                var roomHeight = Rand.Next(1, 3);
+
+                var startIndex = new Point(
+                    x: Rand.Next(1, GridWidth - 1),
+                    y: Rand.Next(1, GridHeight - 1));
+
+                for (var x = -1; x < roomWidth; ++x)
+                {
+                    for (var y = -1; y < roomHeight; ++y)
+                    {
+                        var index = startIndex + new Point(x, y);
+                        var tile = GetTileByIndex(index);
+                        if (tile == null)
+                            continue;
+
+                        if (tile.Index.X == 0 || tile.Index.X == GridWidth - 1 ||
+                            tile.Index.Y == 0 || tile.Index.Y == GridHeight - 1)
+                            continue;
+
+                        SetTileType(tile, TileType.Floor);
+                    }
+                }
+            });
+        }
+
         public bool IsSolid(Point tileIndex)
         {
             if (!TileIsValid(tileIndex))
