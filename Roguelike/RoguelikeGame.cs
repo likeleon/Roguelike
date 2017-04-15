@@ -185,7 +185,8 @@ namespace Roguelike
             _enemies.Clear();
             _keyUiSprite.Color = KeyNotColletedColor;
 
-            _level = Level.Generate(_tileTextures, _virtualSize);
+            var levelSettings = CreateLevelSettings();
+            _level = Level.Generate(_tileTextures, levelSettings);
 
             SpawnItem(ItemType.Key);
 
@@ -194,6 +195,37 @@ namespace Roguelike
             _quest = Quest.CreateRandom();
 
             _player.Position = _level.PlayerSpawnLocation;
+        }
+
+        private LevelSettings CreateLevelSettings()
+        {
+            var roomNumber = _level?.RoomNumber + 1 ?? 0;
+            var floorNumber = _level?.FloorNumber ?? 1;
+            var levelColor = _level?.Color ?? GetRandomLevelColor();
+
+            if (roomNumber == 5)
+            {
+                roomNumber = 0;
+                floorNumber += 1;
+                levelColor = GetRandomLevelColor();
+            }
+
+            return new LevelSettings
+            {
+                RoomNumber = roomNumber,
+                FloorNumber = floorNumber,
+                Color = levelColor,
+                Size = _virtualSize
+            };
+        }
+
+        private Color GetRandomLevelColor()
+        {
+            return new Color(
+                r: Rand.Next(100, 201),
+                g: Rand.Next(100, 201),
+                b: Rand.Next(100, 201),
+                alpha: 255);
         }
 
         private void LoadUI()

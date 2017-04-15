@@ -10,6 +10,14 @@ using System.Linq;
 
 namespace Roguelike
 {
+    public sealed class LevelSettings
+    {
+        public int RoomNumber { get; set; }
+        public int FloorNumber { get; set; }
+        public Point Size { get; set; }
+        public Color Color { get; set; }
+    }
+    
     public sealed class Level
     {
         public static int GridWidth = 19;
@@ -36,8 +44,9 @@ namespace Roguelike
         private readonly List<Torch> _torches = new List<Torch>();
         private Point? _doorTileIndices;
 
-        public int FloorNumber => 1;
-        public int RoomNumber => 0;
+        public int FloorNumber { get; }
+        public int RoomNumber { get; }
+        public Color Color { get; }
 
         public Point Origin { get; }
         public Point Size => new Point(GridWidth, GridHeight);
@@ -45,26 +54,29 @@ namespace Roguelike
         public IEnumerable<Torch> Torches => _torches;
         public Vector2 PlayerSpawnLocation { get; private set; }
 
-        public static Level Generate(TileTextures tileTextures, Point screenSize)
+        public static Level Generate(TileTextures tileTextures, LevelSettings settings)
         {
-            var level = new Level(tileTextures, screenSize);
+            var level = new Level(tileTextures, settings);
             level.Generate();
             return level;
         }
 
-        public static Level LoadFromFile(string fileName, TileTextures tileTextures, Point screenSize)
+        public static Level LoadFromFile(string fileName, TileTextures tileTextures, LevelSettings settings)
         {
-            var level = new Level(tileTextures, screenSize);
+            var level = new Level(tileTextures, settings);
             level.LoadFromFile(fileName);
             return level;
         }
 
-        private Level(TileTextures tileTextures, Point screenSize)
+        private Level(TileTextures tileTextures, LevelSettings settings)
         {
             _tileTextures = tileTextures;
+            FloorNumber = settings.FloorNumber;
+            RoomNumber = settings.RoomNumber;
+            Color = settings.Color;
 
-            var originX = (screenSize.X - GridWidth * TileSize) / 2;
-            var originY = (screenSize.Y - GridHeight * TileSize) / 2;
+            var originX = (settings.Size.X - GridWidth * TileSize) / 2;
+            var originY = (settings.Size.Y - GridHeight * TileSize) / 2;
             Origin = new Point(originX, originY);
 
             for (int x = 0; x < _tiles.GetLength(0); ++x)
@@ -163,6 +175,9 @@ namespace Roguelike
             SpawnRandomTiles(TileType.FloorAlt, count: 15);
 
             UpdateTileTextures();
+
+            foreach (var tile in _tiles)
+                tile.Sprite.Color = Color;
 
             GenerateEntryExit();
 
