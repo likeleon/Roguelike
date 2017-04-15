@@ -31,7 +31,7 @@ namespace Roguelike
             new Point(-2, 0)
         };
 
-        private readonly Texture2D[] _tileTextures = new Texture2D[EnumExtensions.GetCount<TileType>()];
+        private readonly TileTextures _tileTextures;
         private readonly Tile[,] _tiles = new Tile[GridWidth, GridHeight];
         private readonly List<Torch> _torches = new List<Torch>();
         private Point? _doorTileIndices;
@@ -45,33 +45,23 @@ namespace Roguelike
         public IEnumerable<Torch> Torches => _torches;
         public Vector2 PlayerSpawnLocation { get; private set; }
 
-        public Level(Point screenSize)
+        public static Level Generate(TileTextures tileTextures, Point screenSize)
         {
-            SetTileTexture("Tiles/spr_tile_floor", TileType.Floor);
+            var level = new Level(tileTextures, screenSize);
+            level.Generate();
+            return level;
+        }
 
-            SetTileTexture("Tiles/spr_tile_wall_top", TileType.WallTop);
-            SetTileTexture("Tiles/spr_tile_wall_top_left", TileType.WallTopLeft);
-            SetTileTexture("Tiles/spr_tile_wall_top_right", TileType.WallTopRight);
-            SetTileTexture("Tiles/spr_tile_wall_top_t", TileType.WallTopT);
-            SetTileTexture("Tiles/spr_tile_wall_top_end", TileType.WallTopEnd);
+        public static Level LoadFromFile(string fileName, TileTextures tileTextures, Point screenSize)
+        {
+            var level = new Level(tileTextures, screenSize);
+            level.LoadFromFile(fileName);
+            return level;
+        }
 
-            SetTileTexture("Tiles/spr_tile_wall_bottom_left", TileType.WallBottomLeft);
-            SetTileTexture("Tiles/spr_tile_wall_bottom_right", TileType.WallBottomRight);
-            SetTileTexture("Tiles/spr_tile_wall_bottom_t", TileType.WallBottomT);
-            SetTileTexture("Tiles/spr_tile_wall_bottom_end", TileType.WallBottomEnd);
-
-            SetTileTexture("Tiles/spr_tile_wall_side", TileType.WallSide);
-            SetTileTexture("Tiles/spr_tile_wall_side_left_t", TileType.WallSideLeftT);
-            SetTileTexture("Tiles/spr_tile_wall_side_left_end", TileType.WallSideLeftEnd);
-            SetTileTexture("Tiles/spr_tile_wall_side_right_t", TileType.WallSideRightT);
-            SetTileTexture("Tiles/spr_tile_wall_side_right_end", TileType.WallSideRightEnd);
-
-            SetTileTexture("Tiles/spr_tile_wall_intersection", TileType.WallIntersection);
-            SetTileTexture("Tiles/spr_tile_wall_single", TileType.WallSingle);
-
-            SetTileTexture("Tiles/spr_tile_wall_entrance", TileType.WallEntrance);
-            SetTileTexture("Tiles/spr_tile_door_locked", TileType.WallDoorLocked);
-            SetTileTexture("Tiles/spr_tile_door_unlocked", TileType.WallDoorUnlocked);
+        private Level(TileTextures tileTextures, Point screenSize)
+        {
+            _tileTextures = tileTextures;
 
             var originX = (screenSize.X - GridWidth * TileSize) / 2;
             var originY = (screenSize.Y - GridHeight * TileSize) / 2;
@@ -82,12 +72,7 @@ namespace Roguelike
                     _tiles[x, y] = new Tile(new Point(x, y));
         }
 
-        public void SetTileTexture(string assetName, TileType tileType)
-        {
-            _tileTextures[(int)tileType] = Global.Content.Load<Texture2D>(assetName);
-        }
-
-        public void LoadFromFile(string fileName)
+        private void LoadFromFile(string fileName)
         {
             int[] tileIds;
             using (var stream = TitleContainer.OpenStream(fileName))
@@ -109,7 +94,7 @@ namespace Roguelike
                 var tile = _tiles[x, y];
 
                 tile.Type = (TileType)tileIds[i];
-                tile.Sprite = new Sprite(_tileTextures[tileIds[i]]);
+                tile.Sprite = new Sprite(_tileTextures.GetTexture(tile.Type));
                 tile.Sprite.Position = (Origin + new Point(TileSize * x, TileSize * y)).ToVector2();
 
                 if (tile.Type == TileType.WallDoorLocked)
@@ -151,7 +136,7 @@ namespace Roguelike
             return _tiles[x, y];
         }
 
-        public void GenerateLevel()
+        private void Generate()
         {
             for (var x = 0; x < GridWidth; ++x)
             {
@@ -172,6 +157,8 @@ namespace Roguelike
             CreatePath(new Point(1, 1));
 
             CreateRooms(roomCount: 10);
+
+            SpawnRandomTiles(TileType.FloorAlt, count: 15);
 
             UpdateTileTextures();
 
@@ -201,7 +188,7 @@ namespace Roguelike
         {
             tile.Type = tileType;
 
-            var tileTexture = _tileTextures[(int)tileType];
+            var tileTexture = _tileTextures.GetTexture(tileType);
             if (tileTexture != null)
                 tile.Sprite.SetTexture(tileTexture);
         }
@@ -311,8 +298,6 @@ namespace Roguelike
 
         private void SpawnTorches(int torchCount)
         {
-            _torches.Clear();
-
             var usedTiles = new HashSet<Tile>();
 
             Func<Tile> getRandomWallTopTile = () =>
@@ -466,6 +451,22 @@ namespace Roguelike
         {
             var offset = from.Index - to.Index;
             return Math.Abs(offset.X) + Math.Abs(offset.Y);
+        }
+
+        private void SpawnRandomTiles(TileType tileType, int count)
+        {
+            count.Times(() =>
+            {
+                var tileIndex = Point.Zero;
+                while (!IsFloor(tileIndex))
+                {
+                    tileIndex = new Point(
+                        Rand.Next(Level.GridWidth),
+                        Rand.Next(Level.GridHeight));
+                }
+
+                SetTileType(tileIndex, tileType);
+            });
         }
     }
 }

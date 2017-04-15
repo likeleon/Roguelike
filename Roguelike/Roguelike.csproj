@@ -66,6 +66,7 @@
     <Compile Include="Objects\Projectile.cs" />
     <Compile Include="Quest.cs" />
     <Compile Include="Sounds\AmbientSound.cs" />
+    <Compile Include="TileTextures.cs" />
     <Compile Include="Utils\Cache.cs" />
     <Compile Include="Utils\EnumExtensions.cs" />
     <Compile Include="Utils\EnumerableExtensions.cs" />

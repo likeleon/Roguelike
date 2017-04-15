@@ -48,6 +48,7 @@ namespace Roguelike
         private ViewportAdapter _viewportAdapter;
 
         private Texture2D _projectileTexture;
+        private TileTextures _tileTextures;
 
         private Level _level;
         private Player _player;
@@ -115,6 +116,7 @@ namespace Roguelike
 
             _player = new Player(Content);
 
+            _tileTextures = new TileTextures();
             GenerateLevel();
 
             var projectileName = ProjectileNamesByClass[_player.Class];
@@ -148,8 +150,7 @@ namespace Roguelike
 
         private void GenerateLevel()
         {
-            _level = new Level(_virtualSize);
-            _level.GenerateLevel();
+            _level = Level.Generate(_tileTextures, _virtualSize);
 
             if (!Global.DebugLevelGeneration)
             {
@@ -157,9 +158,6 @@ namespace Roguelike
 
                 PopulateLevel();
             }
-
-            _level.SetTileTexture("Tiles/spr_tile_floor_alt", TileType.FloorAlt);
-            SpawnRandomTiles(TileType.FloorAlt, count: 15);
 
             _quest = Quest.CreateRandom();
 
@@ -320,22 +318,6 @@ namespace Roguelike
                     var enemyType = (EnemyType)Rand.Next(EnumExtensions.GetCount<EnemyType>());
                     SpawnEnemy(enemyType);
                 }
-            });
-        }
-
-        private void SpawnRandomTiles(TileType tileType, int count)
-        {
-            count.Times(() =>
-            {
-                var tileIndex = Point.Zero;
-                while (!_level.IsFloor(tileIndex))
-                {
-                    tileIndex = new Point(
-                        Rand.Next(Level.GridWidth), 
-                        Rand.Next(Level.GridHeight));
-                }
-
-                _level.SetTileType(tileIndex, tileType);
             });
         }
 
