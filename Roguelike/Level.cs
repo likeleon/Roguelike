@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Roguelike.Graphics;
 using Roguelike.Objects;
@@ -32,7 +31,6 @@ namespace Roguelike
             new Point(-2, 0)
         };
 
-        private readonly ContentManager _content;
         private readonly Texture2D[] _tileTextures = new Texture2D[EnumExtensions.GetCount<TileType>()];
         private readonly Tile[,] _tiles = new Tile[GridWidth, GridHeight];
         private readonly List<Torch> _torches = new List<Torch>();
@@ -47,10 +45,8 @@ namespace Roguelike
         public IEnumerable<Torch> Torches => _torches;
         public Vector2 PlayerSpawnLocation { get; private set; }
 
-        public Level(ContentManager content, Point screenSize)
+        public Level(Point screenSize)
         {
-            _content = content;
-
             SetTileTexture("Tiles/spr_tile_floor", TileType.Floor);
 
             SetTileTexture("Tiles/spr_tile_wall_top", TileType.WallTop);
@@ -88,7 +84,7 @@ namespace Roguelike
 
         public void SetTileTexture(string assetName, TileType tileType)
         {
-            _tileTextures[(int)tileType] = _content.Load<Texture2D>(assetName);
+            _tileTextures[(int)tileType] = Global.Content.Load<Texture2D>(assetName);
         }
 
         public void LoadFromFile(string fileName)
@@ -130,7 +126,7 @@ namespace Roguelike
             };
             foreach (var tilePos in torchTilePositions)
             {
-                var torch = new Torch(_content);
+                var torch = new Torch();
                 var x = tilePos.X * TileSize + TileSize / 2;
                 var y = tilePos.Y * TileSize + TileSize / 2;
                 torch.Position = Origin.ToVector2() + new Vector2(x, y);
@@ -180,6 +176,8 @@ namespace Roguelike
             UpdateTileTextures();
 
             GenerateEntryExit();
+
+            SpawnTorches(torchCount: 5);
         }
 
         public Tile GetTileByIndex(Point tileIndex)
@@ -292,7 +290,7 @@ namespace Roguelike
         {
             Func<int, Point> getRandomWallTopIndex = y =>
             {
-                while (true)
+                while(true)
                 {
                     var x = Rand.Next(GridWidth);
                     if (_tiles[x, y].Type == TileType.WallTop)
@@ -309,6 +307,35 @@ namespace Roguelike
             _doorTileIndices = exit;
 
             PlayerSpawnLocation = GetActualTileLocation(entrance - new Point(0, 1));
+        }
+
+        private void SpawnTorches(int torchCount)
+        {
+            _torches.Clear();
+
+            var usedTiles = new HashSet<Tile>();
+
+            Func<Tile> getRandomWallTopTile = () =>
+            {
+                while(true)
+                {
+                    var index = new Point(Rand.Next(1, GridWidth - 1), Rand.Next(1, GridHeight - 1));
+                    var tile = GetTileByIndex(index);
+                    if (tile.Type == TileType.WallTop && !usedTiles.Contains(tile))
+                        return tile;
+                }
+            };
+
+            torchCount.Times(() =>
+            {
+                var tile = getRandomWallTopTile();
+
+                var torch = new Torch();
+                torch.Position = GetActualTileLocation(tile.Index);
+                _torches.Add(torch);
+
+                usedTiles.Add(tile);
+            });
         }
 
         public bool IsSolid(Point tileIndex)

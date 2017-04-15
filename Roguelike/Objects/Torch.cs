@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Roguelike.Objects
@@ -8,9 +7,9 @@ namespace Roguelike.Objects
     {
         public float Brightness { get; set; } = 1.0f;
 
-        public Torch(ContentManager content)
+        public Torch()
         {
-            SetSprite(content.Load<Texture2D>("spr_torch"), frames: 5, frameSpeed: 12);
+            SetSprite(Global.Content.Load<Texture2D>("spr_torch"), frames: 5, frameSpeed: 12);
         }
 
         public override void Update(GameTime gameTime)

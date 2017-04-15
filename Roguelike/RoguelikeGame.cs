@@ -148,7 +148,7 @@ namespace Roguelike
 
         private void GenerateLevel()
         {
-            _level = new Level(Content, _virtualSize);
+            _level = new Level(_virtualSize);
             _level.GenerateLevel();
 
             if (!Global.DebugLevelGeneration)
