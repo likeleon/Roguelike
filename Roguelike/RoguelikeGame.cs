@@ -133,6 +133,10 @@ namespace Roguelike
                 case OrderType.ToggleDebugLevelOverview:
                     Global.DebugLevelOverview = !Global.DebugLevelOverview;
                     break;
+
+                case OrderType.GenerateNewLevel:
+                    GenerateLevel();
+                    break;
             }
         }
 
@@ -143,12 +147,9 @@ namespace Roguelike
             _player = new Player(Content, _orderManager);
 
             _tileTextures = new TileTextures();
-            GenerateLevel();
 
             var projectileName = ProjectileNamesByClass[_player.Class];
             _projectileTexture = Content.Load<Texture2D>($"Projectiles/spr_{projectileName}");
-
-            ConstructLightGrid();
 
             LoadUI();
 
@@ -173,10 +174,17 @@ namespace Roguelike
             _coinPickupSound = Content.Load<SoundEffect>("Sounds/snd_coin_pickup");
             _keyPickupSound = Content.Load<SoundEffect>("Sounds/snd_key_pickup");
             _playerHitSound = Content.Load<SoundEffect>("Sounds/snd_player_hit");
+
+            GenerateLevel();
+            ConstructLightGrid();
         }
 
         private void GenerateLevel()
         {
+            _items.Clear();
+            _enemies.Clear();
+            _keyUiSprite.Color = KeyNotColletedColor;
+
             _level = Level.Generate(_tileTextures, _virtualSize);
 
             SpawnItem(ItemType.Key);
@@ -367,10 +375,8 @@ namespace Roguelike
             var playerTile = _level.GetTile(_player.Position);
             if (playerTile.Type == TileType.WallDoorUnlocked)
             {
-                _items.Clear();
-                _enemies.Clear();
                 GenerateLevel();
-                _keyUiSprite.Color = KeyNotColletedColor;
+                return;
             }
 
             _player.Update(gameTime, _level, _camera);

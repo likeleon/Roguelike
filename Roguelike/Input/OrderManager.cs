@@ -16,6 +16,7 @@ namespace Roguelike.Order
 
         ToggleDebugPathFinding,
         ToggleDebugLevelOverview,
+        GenerateNewLevel,
     }
 
     public class OrderManager
@@ -32,6 +33,8 @@ namespace Roguelike.Order
                     OrderIssued?.Invoke(this, OrderType.ToggleDebugPathFinding);
                 else if (key == Keys.F2)
                     OrderIssued?.Invoke(this, OrderType.ToggleDebugLevelOverview);
+                else if (key == Keys.F3)
+                    OrderIssued.Invoke(this, OrderType.GenerateNewLevel);
             };
         }
 
