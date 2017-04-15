@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Roguelike.Graphics;
+using Roguelike.Order;
 using Roguelike.Utils;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,7 @@ namespace Roguelike.Objects
         private static readonly TimeSpan TakeDamageDelay = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan ManaRegenDelay = TimeSpan.FromMilliseconds(200);
 
+        private readonly OrderManager _orderManager;
         private readonly PlayerTrait[] _traits = new PlayerTrait[PlayerTraitCount];
 
         private TimeSpan _attackDelta;
@@ -53,8 +55,10 @@ namespace Roguelike.Objects
         public PlayerClass Class { get; }
         public IEnumerable<PlayerTrait> Traits => _traits;
 
-        public Player(ContentManager content)
+        public Player(ContentManager content, OrderManager orderManager)
         {
+            _orderManager = orderManager;
+
             Class = (PlayerClass)Rand.Next(EnumExtensions.GetCount<PlayerClass>());
 
             var classStatValue = Rand.Next(0, 6);
@@ -167,23 +171,23 @@ namespace Roguelike.Objects
 
             var animState = CurrentAnimationState;
 
-            if (Order.IsOrderIssued(OrderType.MoveLeft))
+            if (_orderManager.IsOrderIssued(OrderType.MoveLeft))
             {
                 movementSpeed.X = -Speed * timeDelta;
                 animState = AnimationState.WalkLeft;
             }
-            else if (Order.IsOrderIssued(OrderType.MoveRight))
+            else if (_orderManager.IsOrderIssued(OrderType.MoveRight))
             {
                 movementSpeed.X = Speed * timeDelta;
                 animState = AnimationState.WalkRight;
             }
 
-            if (Order.IsOrderIssued(OrderType.MoveUp))
+            if (_orderManager.IsOrderIssued(OrderType.MoveUp))
             {
                 movementSpeed.Y = -Speed * timeDelta;
                 animState = AnimationState.WalkUp;
             }
-            else if (Order.IsOrderIssued(OrderType.MoveDown))
+            else if (_orderManager.IsOrderIssued(OrderType.MoveDown))
             {
                 movementSpeed.Y = Speed * timeDelta;
                 animState = AnimationState.WalkDown;
@@ -221,7 +225,7 @@ namespace Roguelike.Objects
             }
 
             _attackDelta += gameTime.ElapsedGameTime;
-            if (_attackDelta > AttackDelay && Order.IsOrderIssued(OrderType.Attack))
+            if (_attackDelta > AttackDelay && _orderManager.IsOrderIssued(OrderType.Attack))
                 IsAttacking = true;
 
             if (!CanTakeDamage)

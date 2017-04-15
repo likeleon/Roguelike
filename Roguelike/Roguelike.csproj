@@ -44,6 +44,7 @@
     <Compile Include="Global.cs" />
     <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Graphics\IDrawable.cs" />
+    <Compile Include="Input\KeyboardListener.cs" />
     <Compile Include="MusicTrack.cs" />
     <Compile Include="Objects\Enemies\Enemy.cs" />
     <Compile Include="Objects\Enemies\EnemyTextureFactory.cs" />
@@ -59,7 +60,7 @@
     <Compile Include="Objects\Items\Potion.cs" />
     <Compile Include="Objects\Player\PlayerClass.cs" />
     <Compile Include="Objects\Player\PlayerTrait.cs" />
-    <Compile Include="Order.cs" />
+    <Compile Include="Input\OrderManager.cs" />
     <Compile Include="Objects\AnimationState.cs" />
     <Compile Include="Objects\Entity.cs" />
     <Compile Include="Objects\Player\Player.cs" />

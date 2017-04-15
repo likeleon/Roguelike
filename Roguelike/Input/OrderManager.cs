@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Roguelike.Input;
+using System;
 
-namespace Roguelike
+namespace Roguelike.Order
 {
     public enum OrderType
     {
@@ -10,12 +12,35 @@ namespace Roguelike
         MoveUp,
         MoveDown,
         Attack,
-        Cancel
+        Cancel,
+
+        ToggleDebugPathFinding,
+        ToggleDebugLevelOverview,
     }
 
-    public static class Order
+    public class OrderManager
     {
-        public static bool IsOrderIssued(OrderType orderType)
+        private readonly KeyboardListener _keyboardListener = new KeyboardListener();
+
+        public event EventHandler<OrderType> OrderIssued;
+
+        public OrderManager()
+        {
+            _keyboardListener.KeyPressed += (_, key) =>
+            {
+                if (key == Keys.F1)
+                    OrderIssued?.Invoke(this, OrderType.ToggleDebugPathFinding);
+                else if (key == Keys.F2)
+                    OrderIssued?.Invoke(this, OrderType.ToggleDebugLevelOverview);
+            };
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            _keyboardListener.Update(gameTime);
+        }
+
+        public bool IsOrderIssued(OrderType orderType)
         {
             var keyboardState = Keyboard.GetState();
             var mouseState = Mouse.GetState();

@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Roguelike.Graphics;
 using Roguelike.Objects;
+using Roguelike.Order;
 using Roguelike.Sounds;
 using Roguelike.Utils;
 using Roguelike.ViewportAdapters;
@@ -31,6 +32,7 @@ namespace Roguelike
         };
 
         private readonly GraphicsDeviceManager _graphics;
+        private readonly OrderManager _orderManager = new OrderManager();
         private readonly Point _virtualSize = new Point(1920, 1080);
         private readonly Point _virtualCenter;
         private readonly Texture2D[] _playerUiTextures = new Texture2D[EnumExtensions.GetCount<PlayerClass>()];
@@ -104,8 +106,7 @@ namespace Roguelike
             Global.GraphicsDevice = GraphicsDevice;
             Global.SpriteBatch = new SpriteBatch(GraphicsDevice);
 
-            //Global.DebugPathFinding = true;
-            //Global.DebugLevelGeneration = true;
+            _orderManager.OrderIssued += HandleOrder;
 
             _viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, _virtualSize);
 
@@ -117,11 +118,29 @@ namespace Roguelike
             base.Initialize();
         }
 
+        private void HandleOrder(object sender, OrderType order)
+        {
+            switch (order)
+            {
+                case OrderType.Cancel:
+                    Exit();
+                    break;
+
+                case OrderType.ToggleDebugPathFinding:
+                    Global.DebugPathFinding = !Global.DebugPathFinding;
+                    break;
+
+                case OrderType.ToggleDebugLevelOverview:
+                    Global.DebugLevelOverview = !Global.DebugLevelOverview;
+                    break;
+            }
+        }
+
         protected override void LoadContent()
         {
             Global.Font = Content.Load<SpriteFont>("Fonts/ADDSBP__");
 
-            _player = new Player(Content);
+            _player = new Player(Content, _orderManager);
 
             _tileTextures = new TileTextures();
             GenerateLevel();
@@ -129,8 +148,7 @@ namespace Roguelike
             var projectileName = ProjectileNamesByClass[_player.Class];
             _projectileTexture = Content.Load<Texture2D>($"Projectiles/spr_{projectileName}");
 
-            if (!Global.DebugLevelGeneration)
-                ConstructLightGrid();
+            ConstructLightGrid();
 
             LoadUI();
 
@@ -161,12 +179,9 @@ namespace Roguelike
         {
             _level = Level.Generate(_tileTextures, _virtualSize);
 
-            if (!Global.DebugLevelGeneration)
-            {
-                SpawnItem(ItemType.Key);
+            SpawnItem(ItemType.Key);
 
-                PopulateLevel();
-            }
+            PopulateLevel();
 
             _quest = Quest.CreateRandom();
 
@@ -337,9 +352,18 @@ namespace Roguelike
 
         protected override void Update(GameTime gameTime)
         {
-            if (Order.IsOrderIssued(OrderType.Cancel))
-                Exit();
+            _orderManager.Update(gameTime);
 
+            _aimSprite.Position = _viewportAdapter.PointToScreen(Mouse.GetState().Position).ToVector2();
+
+            if (!Global.DebugLevelOverview)
+                UpdateWorld(gameTime);
+
+            base.Update(gameTime);
+        }
+
+        private void UpdateWorld(GameTime gameTime)
+        {
             var playerTile = _level.GetTile(_player.Position);
             if (playerTile.Type == TileType.WallDoorUnlocked)
             {
@@ -350,8 +374,6 @@ namespace Roguelike
             }
 
             _player.Update(gameTime, _level, _camera);
-
-            _aimSprite.Position = _viewportAdapter.PointToScreen(Mouse.GetState().Position).ToVector2();
 
             var playerPosition = _player.Position;
 
@@ -402,8 +424,6 @@ namespace Roguelike
                 _scoreTotal += Rand.Next(1000, 2001);
                 _quest = null;
             }
-
-            base.Update(gameTime);
         }
 
         private void UpdateItems(Vector2 playerPosition)
@@ -644,8 +664,10 @@ namespace Roguelike
 
             var spriteBatch = Global.SpriteBatch;
 
-            var worldTransformMatrix = Global.DebugLevelGeneration ? 
-                _viewportAdapter.GetScaleMatrix() : _camera.GetViewMatrix();
+            var worldTransformMatrix = Global.DebugLevelOverview ? 
+                _viewportAdapter.GetScaleMatrix() : 
+                _camera.GetViewMatrix();
+
             spriteBatch.Begin(transformMatrix: worldTransformMatrix);
 
             _level.Draw(spriteBatch, gameTime);
@@ -661,8 +683,11 @@ namespace Roguelike
 
             _player.Draw(spriteBatch, gameTime);
 
-            foreach (var sprite in _lightGrid)
-                sprite.Draw(spriteBatch);
+            if (!Global.DebugLevelOverview)
+            {
+                foreach (var sprite in _lightGrid)
+                    sprite.Draw(spriteBatch);
+            }
 
             spriteBatch.End();
 

@@ -11,6 +11,6 @@ namespace Roguelike
         public static SpriteFont Font { get; set; }
 
         public static bool DebugPathFinding { get; set; }
-        public static bool DebugLevelGeneration { get; set; }
+        public static bool DebugLevelOverview { get; set; }
     }
 }
